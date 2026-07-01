@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Style Preview | LightStair CSS</title>
+<link href="/css" rel="stylesheet">
+<style>
+    html {
+        font-size: 16px;
+    }
+
+    body {
+        color: var(--tx-0);
+        background-color: var(--bg-0);
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Course New", monospace;
+        margin: 0;
+        padding: 2rem;
+    }
+
+    main > section {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .overview-card {
+        padding: 1.5rem;
+        border: 1px solid var(--bd-0);
+        border-radius: 8px;
+    }
+
+    .card-texts,
+    .card-backgrounds,
+    .card-borders {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-texts > .tx-step {
+        font-size: 0.9rem;
+    }
+
+    .card-backgrounds > .bg-step {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .card-borders > .bd-step {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--bd-0);
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .combo-card {
+        padding: 1.5rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+</style>
+
+</head>
+<body>
+
+<header>
+    <h1>Style Preview</h1>
+</header>
+
+<main>
+    <section id="overviewSection"></section>
+    <section id="comboSection"></section>
+</main>
+
+<template id="overviewCard">
+    <div class="overview-card">
+        <div class="card-texts"></div>
+        <div class="card-backgrounds"></div>
+        <div class="card-borders"></div>
+    </div>
+</template>
+
+<template id="comboCard">
+    <div class="combo-card"></div>
+</template>
+
+<script>
+(async function () {
+    try {
+        const res = await fetch('/config');
+        if (!res.ok) {
+            throw new Error('Config fetch failed: ' + res.status);
+        }
+        const config = await res.json();
+        applyConfig(config);
+        applyComboCards(config);
+    } catch (err) {
+        console.error('[Preview] Failed to load config:', err.message);
+    }
+
+    function applyConfig(config) {
+        const txSteps = config.tx_l_steps;
+        const bgSteps = config.bg_l_steps;
+        const bdSteps = config.bd_l_steps;
+
+        if (!txSteps || !bgSteps || !bdSteps) {
+            throw new Error('Invalid config: tx_l_steps, bg_l_steps, bd_l_steps are required');
+        }
+
+        const template = document.getElementById('overviewCard');
+
+        for (let n = 0; n < bgSteps; n++) {
+            const clone = document.importNode(template.content, true);
+            const card = clone.querySelector('.overview-card');
+            const textContainer = clone.querySelector('.card-texts');
+            const bgContainer = clone.querySelector('.card-backgrounds');
+            const borderContainer = clone.querySelector('.card-borders');
+
+            card.style.backgroundColor = `var(--bg-${n})`;
+
+            for (let i = 0; i < txSteps; i++) {
+                const div = document.createElement('div');
+                div.className = 'tx-step';
+                div.style.color = `var(--tx-${i})`;
+                div.textContent = `Text-${i}`;
+                textContainer.appendChild(div);
+            }
+
+            for (let j = 0; j < bgSteps; j++) {
+                const div = document.createElement('div');
+                div.className = 'bg-step';
+                div.style.backgroundColor = `var(--bg-${j})`;
+                div.textContent = `Background-${j}`;
+                bgContainer.appendChild(div);
+            }
+
+            for (let k = 0; k < bdSteps; k++) {
+                const div = document.createElement('div');
+                div.className = 'bd-step';
+                div.style.borderColor = `var(--bd-${k})`;
+                div.textContent = `Border-${k}`;
+                borderContainer.appendChild(div);
+            }
+
+            document.getElementById('overviewSection').appendChild(clone);
+        }
+    }
+
+    function applyComboCards(config) {
+        const txSteps = config.tx_l_steps;
+        const bgSteps = config.bg_l_steps;
+        const bdSteps = config.bd_l_steps;
+
+        if (!txSteps || !bgSteps || !bdSteps) {
+            throw new Error('Invalid config: tx_l_steps, bg_l_steps, bd_l_steps are required');
+        }
+
+        const template = document.getElementById('comboCard');
+
+        for (let bg = 0; bg < bgSteps; bg++) {
+            for (let tx = 0; tx < txSteps; tx++) {
+                for (let bd = 0; bd < bdSteps; bd++) {
+                    const clone = document.importNode(template.content, true);
+                    const card = clone.querySelector('.combo-card');
+
+                    card.style.color = `var(--tx-${tx})`;
+                    card.style.backgroundColor = `var(--bg-${bg})`;
+                    card.style.border = `1px solid var(--bd-${bd})`;
+                    card.innerHTML = `Text-${tx}<br>Background-${bg}<br>Border-${bd}<br>`;
+
+                    document.getElementById('comboSection').appendChild(clone);
+                }
+            }
+        }
+    }
+})();
+</script>
+
+</body>
+</html>

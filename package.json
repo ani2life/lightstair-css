@@ -1,0 +1,48 @@
+{
+  "name": "lightstair-css",
+  "version": "0.1.0",
+  "description": "글자색, 배경색, 테두리색의 단계별 밝기를 CSS 코드로 생성하는 CLI 패키지",
+  "keywords": [
+    "color",
+    "css",
+    "cli",
+    "theming",
+    "dark-mode",
+    "lightstair"
+  ],
+  "author": "박민권 <ani2life@gmail.com> (https://github.com/ani2life)",
+  "license": "MIT",
+  "homepage": "https://github.com/ani2life/lightstair-css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ani2life/lightstair-css"
+  },
+  "bugs": {
+    "url": "https://github.com/ani2life/lightstair-css/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "bin": {
+    "lightstair-css": "./bin/cli.js",
+    "lightstair": "./bin/cli.js"
+  },
+  "exports": {
+    ".": "./src/cli.js",
+    "./generator": "./src/generator.js"
+  },
+  "dependencies": {
+    "@toolsnap/css-minifier-tool": "^1.0.0",
+    "colorjs.io": "^0.6.1",
+    "commander": "^15.0.0",
+    "open": "^11.0.0",
+    "yaml": "^2.9.0"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "templates/",
+    "preview/"
+  ]
+}
