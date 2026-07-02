@@ -5,24 +5,24 @@ import http from 'node:http';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
 import { beautify } from '@toolsnap/css-minifier-tool';
-import { generateCSS, generateBakedCSS } from './generator.js';
 import open from 'open';
+import { generateCSS, generateBakedCSS } from './generator.js';
 
+const SRC_DIR = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CONFIG_FILE = 'lightstair-css.yml';
-const scriptDir = dirname(fileURLToPath(import.meta.url));
+const DEFAULT_CONFIG_PATH = resolve(SRC_DIR, '..', 'templates', DEFAULT_CONFIG_FILE);
 
 const program = new Command();
 const configOption = new Option('-c, --config <path>', 'path to configuration file').default(DEFAULT_CONFIG_FILE);
 
 function loadConfig(configPath) {
     const raw = readFileSync(configPath, 'utf-8');
-    const config = parse(raw);
+    const userConfig = parse(raw);
 
-    // 접두어 기본값 처리
-    config.tx_prefix = config.tx_prefix || 'tx-';
-    config.bg_prefix = config.bg_prefix || 'bg-';
-    config.bd_prefix = config.bd_prefix || 'bd-';
+    const defaultRaw = readFileSync(DEFAULT_CONFIG_PATH, 'utf-8');
+    const defaultConfig = parse(defaultRaw);
 
+    const config = Object.assign({}, defaultConfig, userConfig);
     return config;
 }
 
@@ -67,8 +67,7 @@ program.command('init').description('create a default lightstair-css.yml config 
         console.log(`[OK] Config already exists: ${targetPath}`);
         process.exit(0);
     }
-    const templatePath = resolve(scriptDir, '..', 'templates', DEFAULT_CONFIG_FILE);
-    copyFileSync(templatePath, targetPath);
+    copyFileSync(DEFAULT_CONFIG_PATH, targetPath);
     console.log(`[OK] Created: ${targetPath}`);
     process.exit(0);
 });
@@ -91,7 +90,7 @@ program
 
         const server = http.createServer((req, res) => {
             if (req.url === '/') {
-                const htmlPath = resolve(scriptDir, '..', 'preview', 'index.html');
+                const htmlPath = resolve(SRC_DIR, '..', 'preview', 'index.html');
                 const htmlContent = readFileSync(htmlPath, 'utf-8');
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 res.end(htmlContent);
