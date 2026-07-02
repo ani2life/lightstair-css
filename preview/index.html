@@ -104,17 +104,11 @@
     }
 
     function applyConfig(config) {
-        const txSteps = config.tx_l_steps;
-        const bgSteps = config.bg_l_steps;
-        const bdSteps = config.bd_l_steps;
-
-        if (!txSteps || !bgSteps || !bdSteps) {
-            throw new Error('Invalid config: tx_l_steps, bg_l_steps, bd_l_steps are required');
-        }
+        const { tx_l_steps, bg_l_steps, bd_l_steps } = config;
 
         const template = document.getElementById('overviewCard');
 
-        for (let n = 0; n < bgSteps; n++) {
+        for (let n = 0; n < bg_l_steps; n++) {
             const clone = document.importNode(template.content, true);
             const card = clone.querySelector('.overview-card');
             const textContainer = clone.querySelector('.card-texts');
@@ -123,7 +117,7 @@
 
             card.style.backgroundColor = `var(--${config.bg_prefix}${n})`;
 
-            for (let i = 0; i < txSteps; i++) {
+            for (let i = 0; i < tx_l_steps; i++) {
                 const div = document.createElement('div');
                 div.className = 'tx-step';
                 const txVar = `--${config.tx_prefix}${i}`;
@@ -132,7 +126,7 @@
                 textContainer.appendChild(div);
             }
 
-            for (let j = 0; j < bgSteps; j++) {
+            for (let j = 0; j < bg_l_steps; j++) {
                 const div = document.createElement('div');
                 div.className = 'bg-step';
                 const bgVar = `--${config.bg_prefix}${j}`;
@@ -141,7 +135,7 @@
                 bgContainer.appendChild(div);
             }
 
-            for (let k = 0; k < bdSteps; k++) {
+            for (let k = 0; k < bd_l_steps; k++) {
                 const div = document.createElement('div');
                 div.className = 'bd-step';
                 const bdVar = `--${config.bd_prefix}${k}`;
@@ -155,19 +149,13 @@
     }
 
     function applyComboCards(config) {
-        const txSteps = config.tx_l_steps;
-        const bgSteps = config.bg_l_steps;
-        const bdSteps = config.bd_l_steps;
-
-        if (!txSteps || !bgSteps || !bdSteps) {
-            throw new Error('Invalid config: tx_l_steps, bg_l_steps, bd_l_steps are required');
-        }
+        const { tx_l_steps, bg_l_steps, bd_l_steps } = config;
 
         const template = document.getElementById('comboCard');
 
-        for (let bg = 0; bg < bgSteps; bg++) {
-            for (let tx = 0; tx < txSteps; tx++) {
-                for (let bd = 0; bd < bdSteps; bd++) {
+        for (let bg = 0; bg < bg_l_steps; bg++) {
+            for (let tx = 0; tx < tx_l_steps; tx++) {
+                for (let bd = 0; bd < bd_l_steps; bd++) {
                     const clone = document.importNode(template.content, true);
                     const card = clone.querySelector('.combo-card');
 
