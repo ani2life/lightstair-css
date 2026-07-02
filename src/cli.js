@@ -13,7 +13,7 @@ const DEFAULT_CONFIG_FILE = 'lightstair-css.yml';
 const DEFAULT_CONFIG_PATH = resolve(SRC_DIR, '..', 'templates', DEFAULT_CONFIG_FILE);
 
 const program = new Command();
-const configOption = new Option('-c, --config <path>', 'path to configuration file').default(DEFAULT_CONFIG_FILE);
+const configOption = new Option('-c, --config <path>', 'path to configuration file');
 
 function loadConfig(configPath) {
     const raw = readFileSync(configPath, 'utf-8');
@@ -26,6 +26,28 @@ function loadConfig(configPath) {
     return config;
 }
 
+function ensureConfigFile(configPath, { suppressIfExists = false } = {}) {
+    const targetPath = resolve(configPath);
+    if (existsSync(targetPath)) {
+        if (!suppressIfExists) console.log(`[OK] Config already exists: ${targetPath}`);
+        return;
+    }
+    copyFileSync(DEFAULT_CONFIG_PATH, targetPath);
+    console.log(`[OK] Created: ${targetPath}`);
+}
+
+function resolveAndEnsureConfigFile(options, { suppressIfExists = true } = {}) {
+    const configPath = options.config === undefined
+        ? resolve(process.cwd(), DEFAULT_CONFIG_FILE)
+        : resolve(options.config);
+
+    if (options.config === undefined) {
+        ensureConfigFile(configPath, { suppressIfExists });
+    }
+
+    return configPath;
+}
+
 program
     .name('lightstair-css')
     .description('LightStair CSS CLI tool for generating color values')
@@ -35,7 +57,8 @@ program
     .option('--bake [format]', 'bake CSS variables into computed values (oklch, rgb, hex)')
     .action(() => {
         const options = program.opts();
-        const configPath = resolve(options.config);
+        const configPath = resolveAndEnsureConfigFile(options, { suppressIfExists: true });
+
         const outputPath = resolve(options.output);
         const bakeFormat = (() => {
             if (options.bake === undefined) return null;
@@ -63,12 +86,7 @@ program
 
 program.command('init').description('create a default lightstair-css.yml config file').action(() => {
     const targetPath = resolve(process.cwd(), DEFAULT_CONFIG_FILE);
-    if (existsSync(targetPath)) {
-        console.log(`[OK] Config already exists: ${targetPath}`);
-        process.exit(0);
-    }
-    copyFileSync(DEFAULT_CONFIG_PATH, targetPath);
-    console.log(`[OK] Created: ${targetPath}`);
+    ensureConfigFile(targetPath, { suppressIfExists: false });
     process.exit(0);
 });
 
@@ -78,7 +96,8 @@ program
     .addOption(configOption)
     .option('-p, --port <number>', 'port number to use (default: random)')
     .action((options) => {
-        const configPath = resolve(options.config);
+        const configPath = resolveAndEnsureConfigFile(options, { suppressIfExists: true });
+
         const port = options.port !== undefined
             ? parseInt(options.port, 10)
             : 0;
