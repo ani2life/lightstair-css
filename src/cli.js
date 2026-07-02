@@ -16,7 +16,14 @@ const configOption = new Option('-c, --config <path>', 'path to configuration fi
 
 function loadConfig(configPath) {
     const raw = readFileSync(configPath, 'utf-8');
-    return parse(raw);
+    const config = parse(raw);
+
+    // 접두어 기본값 처리
+    config.tx_prefix = config.tx_prefix || 'tx-';
+    config.bg_prefix = config.bg_prefix || 'bg-';
+    config.bd_prefix = config.bd_prefix || 'bd-';
+
+    return config;
 }
 
 program

@@ -16,3 +16,7 @@ bd_l_gap: 0.09 # 테두리 밝기 간격
 tx_l_steps: 5 # 글자 밝기 단계
 bg_l_steps: 5 # 배경 밝기 단계
 bd_l_steps: 5 # 테두리 밝기 단계
+
+tx_prefix: tx- # 글자 색상 CSS 변수 접두어 (기본값: tx-)
+bg_prefix: bg- # 배경 색상 CSS 변수 접두어 (기본값: bg-)
+bd_prefix: bd- # 테두리 색상 CSS 변수 접두어 (기본값: bd-)

@@ -121,29 +121,32 @@
             const bgContainer = clone.querySelector('.card-backgrounds');
             const borderContainer = clone.querySelector('.card-borders');
 
-            card.style.backgroundColor = `var(--bg-${n})`;
+            card.style.backgroundColor = `var(--${config.bg_prefix}${n})`;
 
             for (let i = 0; i < txSteps; i++) {
                 const div = document.createElement('div');
                 div.className = 'tx-step';
-                div.style.color = `var(--tx-${i})`;
-                div.textContent = `Text-${i}`;
+                const txVar = `--${config.tx_prefix}${i}`;
+                div.style.color = `var(${txVar})`;
+                div.textContent = txVar;
                 textContainer.appendChild(div);
             }
 
             for (let j = 0; j < bgSteps; j++) {
                 const div = document.createElement('div');
                 div.className = 'bg-step';
-                div.style.backgroundColor = `var(--bg-${j})`;
-                div.textContent = `Background-${j}`;
+                const bgVar = `--${config.bg_prefix}${j}`;
+                div.style.backgroundColor = `var(${bgVar})`;
+                div.textContent = bgVar;
                 bgContainer.appendChild(div);
             }
 
             for (let k = 0; k < bdSteps; k++) {
                 const div = document.createElement('div');
                 div.className = 'bd-step';
-                div.style.borderColor = `var(--bd-${k})`;
-                div.textContent = `Border-${k}`;
+                const bdVar = `--${config.bd_prefix}${k}`;
+                div.style.border = `1px solid var(${bdVar})`;
+                div.textContent = bdVar;
                 borderContainer.appendChild(div);
             }
 
@@ -168,10 +171,13 @@
                     const clone = document.importNode(template.content, true);
                     const card = clone.querySelector('.combo-card');
 
-                    card.style.color = `var(--tx-${tx})`;
-                    card.style.backgroundColor = `var(--bg-${bg})`;
-                    card.style.border = `1px solid var(--bd-${bd})`;
-                    card.innerHTML = `Text-${tx}<br>Background-${bg}<br>Border-${bd}<br>`;
+                    card.style.color = `var(--${config.tx_prefix}${tx})`;
+                    card.style.backgroundColor = `var(--${config.bg_prefix}${bg})`;
+                    card.style.border = `1px solid var(--${config.bd_prefix}${bd})`;
+                    const txVar = `--${config.tx_prefix}${tx}`;
+                    const bgVar = `--${config.bg_prefix}${bg}`;
+                    const bdVar = `--${config.bd_prefix}${bd}`;
+                    card.innerHTML = `${txVar}<br>${bgVar}<br>${bdVar}<br>`;
 
                     document.getElementById('comboSection').appendChild(clone);
                 }
