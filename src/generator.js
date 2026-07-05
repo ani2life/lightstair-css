@@ -17,20 +17,20 @@ export function generateCSS(config) {
         ).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, 'tx-l', tx_l_gap, tx_l_steps, tx_start_number, 'tx-l-dir');
-    const bgSteps = generateSteps(bg_prefix, 'bg-l', bg_l_gap, bg_l_steps, bg_start_number, 'bg-l-dir');
-    const bdSteps = generateSteps(bd_prefix, 'bd-l', bd_l_gap, bd_l_steps, bd_start_number, 'bd-l-dir');
+    const txSteps = generateSteps(tx_prefix, `${tx_prefix}-l`, tx_l_gap, tx_l_steps, tx_start_number, `${tx_prefix}-l-dir`);
+    const bgSteps = generateSteps(bg_prefix, `${bg_prefix}-l`, bg_l_gap, bg_l_steps, bg_start_number, `${bg_prefix}-l-dir`);
+    const bdSteps = generateSteps(bd_prefix, `${bd_prefix}-l`, bd_l_gap, bd_l_steps, bd_start_number, `${bd_prefix}-l-dir`);
 
     return /* css */`
         :root {
-            --tx-l-dir: 1;
-            --bg-l-dir: -1;
-            --bd-l-dir: -1;
+            --${tx_prefix}-l-dir: 1;
+            --${bg_prefix}-l-dir: -1;
+            --${bd_prefix}-l-dir: -1;
 
             @media (prefers-color-scheme: dark) {
-                --tx-l-dir: -1;
-                --bg-l-dir: 1;
-                --bd-l-dir: 1;
+                --${tx_prefix}-l-dir: -1;
+                --${bg_prefix}-l-dir: 1;
+                --${bd_prefix}-l-dir: 1;
             }
         }
 
@@ -38,14 +38,14 @@ export function generateCSS(config) {
             --base-c: ${base_c};
             --base-h: ${base_h};
 
-            --tx-l: ${tx_l};
-            --bg-l: ${bg_l};
-            --bd-l: ${bd_l};
+            --${tx_prefix}-l: ${tx_l};
+            --${bg_prefix}-l: ${bg_l};
+            --${bd_prefix}-l: ${bd_l};
 
             @media (prefers-color-scheme: dark) {
-                --tx-l: ${dark_tx_l};
-                --bg-l: ${dark_bg_l};
-                --bd-l: ${dark_bd_l};
+                --${tx_prefix}-l: ${dark_tx_l};
+                --${bg_prefix}-l: ${dark_bg_l};
+                --${bd_prefix}-l: ${dark_bd_l};
             }
 
             ${txSteps}
