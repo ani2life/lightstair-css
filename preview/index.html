@@ -104,7 +104,11 @@
     }
 
     function applyConfig(config) {
-        const { tx_l_steps, bg_l_steps, bd_l_steps } = config;
+        const {
+            tx_l_steps, bg_l_steps, bd_l_steps,
+            tx_prefix, bg_prefix, bd_prefix,
+            tx_start_number, bg_start_number, bd_start_number,
+        } = config;
 
         const template = document.getElementById('overviewCard');
 
@@ -115,12 +119,12 @@
             const bgContainer = clone.querySelector('.card-backgrounds');
             const borderContainer = clone.querySelector('.card-borders');
 
-            card.style.backgroundColor = `var(--${config.bg_prefix}${n})`;
+            card.style.backgroundColor = `var(--${bg_prefix}${n + bg_start_number})`;
 
             for (let i = 0; i < tx_l_steps; i++) {
                 const div = document.createElement('div');
                 div.className = 'tx-step';
-                const txVar = `--${config.tx_prefix}${i}`;
+                const txVar = `--${tx_prefix}${i + tx_start_number}`;
                 div.style.color = `var(${txVar})`;
                 div.textContent = txVar;
                 textContainer.appendChild(div);
@@ -129,7 +133,7 @@
             for (let j = 0; j < bg_l_steps; j++) {
                 const div = document.createElement('div');
                 div.className = 'bg-step';
-                const bgVar = `--${config.bg_prefix}${j}`;
+                const bgVar = `--${bg_prefix}${j + bg_start_number}`;
                 div.style.backgroundColor = `var(${bgVar})`;
                 div.textContent = bgVar;
                 bgContainer.appendChild(div);
@@ -138,7 +142,7 @@
             for (let k = 0; k < bd_l_steps; k++) {
                 const div = document.createElement('div');
                 div.className = 'bd-step';
-                const bdVar = `--${config.bd_prefix}${k}`;
+                const bdVar = `--${bd_prefix}${k + bd_start_number}`;
                 div.style.border = `1px solid var(${bdVar})`;
                 div.textContent = bdVar;
                 borderContainer.appendChild(div);
@@ -149,7 +153,11 @@
     }
 
     function applyComboCards(config) {
-        const { tx_l_steps, bg_l_steps, bd_l_steps } = config;
+        const {
+            tx_l_steps, bg_l_steps, bd_l_steps,
+            tx_prefix, bg_prefix, bd_prefix,
+            tx_start_number, bg_start_number, bd_start_number,
+        } = config;
 
         const template = document.getElementById('comboCard');
 
@@ -159,12 +167,12 @@
                     const clone = document.importNode(template.content, true);
                     const card = clone.querySelector('.combo-card');
 
-                    card.style.color = `var(--${config.tx_prefix}${tx})`;
-                    card.style.backgroundColor = `var(--${config.bg_prefix}${bg})`;
-                    card.style.border = `1px solid var(--${config.bd_prefix}${bd})`;
-                    const txVar = `--${config.tx_prefix}${tx}`;
-                    const bgVar = `--${config.bg_prefix}${bg}`;
-                    const bdVar = `--${config.bd_prefix}${bd}`;
+                    const txVar = `--${tx_prefix}${tx + tx_start_number}`;
+                    const bgVar = `--${bg_prefix}${bg + bg_start_number}`;
+                    const bdVar = `--${bd_prefix}${bd + bd_start_number}`;
+                    card.style.color = `var(${txVar})`;
+                    card.style.backgroundColor = `var(${bgVar})`;
+                    card.style.border = `1px solid var(${bdVar})`;
                     card.innerHTML = `${txVar}<br>${bgVar}<br>${bdVar}<br>`;
 
                     document.getElementById('comboSection').appendChild(clone);
