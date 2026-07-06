@@ -1,5 +1,6 @@
 base_c: 0.01 # OKLCH 기준 채도(Chroma)
 base_h: 240 # OKLCH 기준 색상(Hue)
+base_prefix: lightstair # base-* CSS 변수 접두어
 
 tx_l: 0.22 # 시작 글자 밝기
 bg_l: 1.0 # 시작 배경 밝기

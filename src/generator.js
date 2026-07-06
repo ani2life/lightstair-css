@@ -3,6 +3,7 @@ import Color from 'colorjs.io';
 export function generateCSS(config) {
     const {
         base_c, base_h,
+        base_prefix,
         tx_l, bg_l, bd_l,
         dark_tx_l, dark_bg_l, dark_bd_l,
         tx_l_gap, bg_l_gap, bd_l_gap,
@@ -11,38 +12,34 @@ export function generateCSS(config) {
         tx_start_number, bg_start_number, bd_start_number,
     } = config;
 
-    function generateSteps(prefix, baseL, gap, steps, startNumber, dir) {
+    function generateSteps(prefix, baseL, gap, steps, startNumber, dir, basePrefix) {
         return Array.from({ length: steps }, (_, i) =>
-            `--${prefix}-${i + startNumber}: oklch(clamp(0, var(--${baseL}) + (${gap} * ${i} * var(--${dir})), 1) var(--base-c) var(--base-h));`
+            `--${prefix}-${i + startNumber}: oklch(clamp(0, var(--${baseL}) + (${gap} * ${i} * var(--${dir})), 1) var(--${basePrefix}-base-c) var(--${basePrefix}-base-h));`
         ).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, `${tx_prefix}-l`, tx_l_gap, tx_l_steps, tx_start_number, `${tx_prefix}-l-dir`);
-    const bgSteps = generateSteps(bg_prefix, `${bg_prefix}-l`, bg_l_gap, bg_l_steps, bg_start_number, `${bg_prefix}-l-dir`);
-    const bdSteps = generateSteps(bd_prefix, `${bd_prefix}-l`, bd_l_gap, bd_l_steps, bd_start_number, `${bd_prefix}-l-dir`);
+    const txSteps = generateSteps(tx_prefix, `${tx_prefix}-l`, tx_l_gap, tx_l_steps, tx_start_number, `${tx_prefix}-l-dir`, base_prefix);
+    const bgSteps = generateSteps(bg_prefix, `${bg_prefix}-l`, bg_l_gap, bg_l_steps, bg_start_number, `${bg_prefix}-l-dir`, base_prefix);
+    const bdSteps = generateSteps(bd_prefix, `${bd_prefix}-l`, bd_l_gap, bd_l_steps, bd_start_number, `${bd_prefix}-l-dir`, base_prefix);
 
     return /* css */`
         :root {
+            --${base_prefix}-base-c: ${base_c};
+            --${base_prefix}-base-h: ${base_h};
+
             --${tx_prefix}-l-dir: 1;
             --${bg_prefix}-l-dir: -1;
             --${bd_prefix}-l-dir: -1;
-
-            @media (prefers-color-scheme: dark) {
-                --${tx_prefix}-l-dir: -1;
-                --${bg_prefix}-l-dir: 1;
-                --${bd_prefix}-l-dir: 1;
-            }
-        }
-
-        :root {
-            --base-c: ${base_c};
-            --base-h: ${base_h};
 
             --${tx_prefix}-l: ${tx_l};
             --${bg_prefix}-l: ${bg_l};
             --${bd_prefix}-l: ${bd_l};
 
             @media (prefers-color-scheme: dark) {
+                --${tx_prefix}-l-dir: -1;
+                --${bg_prefix}-l-dir: 1;
+                --${bd_prefix}-l-dir: 1;
+
                 --${tx_prefix}-l: ${dark_tx_l};
                 --${bg_prefix}-l: ${dark_bg_l};
                 --${bd_prefix}-l: ${dark_bd_l};
