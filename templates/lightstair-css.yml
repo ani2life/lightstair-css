@@ -1,10 +1,15 @@
-base_c: 0.01 # OKLCH 기준 채도(Chroma)
-base_h: 240 # OKLCH 기준 색상(Hue)
-base_prefix: lightstair # base-* CSS 변수 접두어
+tx_c: 0.01 # 고정 글자 채도(Chroma)
+tx_h: 240 # 고정 글자 색상(Hue)
 
-tx_l: 0.22 # 시작 글자 밝기
-bg_l: 1.0 # 시작 배경 밝기
-bd_l: 0.92 # 시작 테두리 밝기
+bg_c: 0.01 # 고정 배경 채도(Chroma)
+bg_h: 240 # 고정 배경 색상(Hue)
+
+bd_c: 0.01 # 고정 테두리 채도(Chroma)
+bd_h: 240 # 고정 테두리 색상(Hue)
+
+tx_l: 0.22 # 시작 글자 밝기(Lightness)
+bg_l: 1.0 # 시작 배경 밝기(Lightness)
+bd_l: 0.92 # 시작 테두리 밝기(Lightness)
 
 dark_tx_l: 0.94 # 다크모드 시작 글자 밝기
 dark_bg_l: 0.18 # 다크모드 시작 배경 밝기

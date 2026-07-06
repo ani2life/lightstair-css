@@ -2,8 +2,9 @@ import Color from 'colorjs.io';
 
 export function generateCSS(config) {
     const {
-        base_c, base_h,
-        base_prefix,
+        tx_c, tx_h,
+        bg_c, bg_h,
+        bd_c, bd_h,
         tx_l, bg_l, bd_l,
         dark_tx_l, dark_bg_l, dark_bd_l,
         tx_l_gap, bg_l_gap, bd_l_gap,
@@ -12,20 +13,24 @@ export function generateCSS(config) {
         tx_start_number, bg_start_number, bd_start_number,
     } = config;
 
-    function generateSteps(prefix, baseL, gap, steps, startNumber, dir, basePrefix) {
+    function generateSteps(prefix, baseL, gap, steps, startNumber, dir) {
         return Array.from({ length: steps }, (_, i) =>
-            `--${prefix}-${i + startNumber}: oklch(clamp(0, var(--${baseL}) + (${gap} * ${i} * var(--${dir})), 1) var(--${basePrefix}-base-c) var(--${basePrefix}-base-h));`
+            `--${prefix}-${i + startNumber}: oklch(clamp(0, var(--${baseL}) + (${gap} * ${i} * var(--${dir})), 1) var(--${prefix}-c) var(--${prefix}-h));`
         ).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, `${tx_prefix}-l`, tx_l_gap, tx_l_steps, tx_start_number, `${tx_prefix}-l-dir`, base_prefix);
-    const bgSteps = generateSteps(bg_prefix, `${bg_prefix}-l`, bg_l_gap, bg_l_steps, bg_start_number, `${bg_prefix}-l-dir`, base_prefix);
-    const bdSteps = generateSteps(bd_prefix, `${bd_prefix}-l`, bd_l_gap, bd_l_steps, bd_start_number, `${bd_prefix}-l-dir`, base_prefix);
+    const txSteps = generateSteps(tx_prefix, `${tx_prefix}-l`, tx_l_gap, tx_l_steps, tx_start_number, `${tx_prefix}-l-dir`);
+    const bgSteps = generateSteps(bg_prefix, `${bg_prefix}-l`, bg_l_gap, bg_l_steps, bg_start_number, `${bg_prefix}-l-dir`);
+    const bdSteps = generateSteps(bd_prefix, `${bd_prefix}-l`, bd_l_gap, bd_l_steps, bd_start_number, `${bd_prefix}-l-dir`);
 
     return /* css */`
         :root {
-            --${base_prefix}-base-c: ${base_c};
-            --${base_prefix}-base-h: ${base_h};
+            --${tx_prefix}-c: ${tx_c};
+            --${tx_prefix}-h: ${tx_h};
+            --${bg_prefix}-c: ${bg_c};
+            --${bg_prefix}-h: ${bg_h};
+            --${bd_prefix}-c: ${bd_c};
+            --${bd_prefix}-h: ${bd_h};
 
             --${tx_prefix}-l-dir: 1;
             --${bg_prefix}-l-dir: -1;
@@ -54,7 +59,9 @@ export function generateCSS(config) {
 
 export function generateBakedCSS(config, format) {
     const {
-        base_c, base_h,
+        tx_c, tx_h,
+        bg_c, bg_h,
+        bd_c, bd_h,
         tx_l, bg_l, bd_l,
         dark_tx_l, dark_bg_l, dark_bd_l,
         tx_l_gap, bg_l_gap, bd_l_gap,
@@ -80,20 +87,20 @@ export function generateBakedCSS(config, format) {
         return color.toString({ format: format });
     }
 
-    function generateSteps(prefix, baseL, gap, steps, startNumber, dir) {
+    function generateSteps(prefix, baseL, gap, steps, startNumber, dir, c, h) {
         return Array.from({ length: steps }, (_, i) => {
             const l = clamp(baseL + gap * i * dir);
-            return `--${prefix}-${i + startNumber}: ${formatColor(l, base_c, base_h)};`;
+            return `--${prefix}-${i + startNumber}: ${formatColor(l, c, h)};`;
         }).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, tx_l, tx_l_gap, tx_l_steps, tx_start_number, TX_DIR);
-    const bgSteps = generateSteps(bg_prefix, bg_l, bg_l_gap, bg_l_steps, bg_start_number, BG_DIR);
-    const bdSteps = generateSteps(bd_prefix, bd_l, bd_l_gap, bd_l_steps, bd_start_number, BD_DIR);
+    const txSteps = generateSteps(tx_prefix, tx_l, tx_l_gap, tx_l_steps, tx_start_number, TX_DIR, tx_c, tx_h);
+    const bgSteps = generateSteps(bg_prefix, bg_l, bg_l_gap, bg_l_steps, bg_start_number, BG_DIR, bg_c, bg_h);
+    const bdSteps = generateSteps(bd_prefix, bd_l, bd_l_gap, bd_l_steps, bd_start_number, BD_DIR, bd_c, bd_h);
 
-    const txStepsDark = generateSteps(tx_prefix, dark_tx_l, tx_l_gap, tx_l_steps, tx_start_number, -TX_DIR);
-    const bgStepsDark = generateSteps(bg_prefix, dark_bg_l, bg_l_gap, bg_l_steps, bg_start_number, -BG_DIR);
-    const bdStepsDark = generateSteps(bd_prefix, dark_bd_l, bd_l_gap, bd_l_steps, bd_start_number, -BD_DIR);
+    const txStepsDark = generateSteps(tx_prefix, dark_tx_l, tx_l_gap, tx_l_steps, tx_start_number, -TX_DIR, tx_c, tx_h);
+    const bgStepsDark = generateSteps(bg_prefix, dark_bg_l, bg_l_gap, bg_l_steps, bg_start_number, -BG_DIR, bg_c, bg_h);
+    const bdStepsDark = generateSteps(bd_prefix, dark_bd_l, bd_l_gap, bd_l_steps, bd_start_number, -BD_DIR, bd_c, bd_h);
 
     return /* css */`
         :root {
