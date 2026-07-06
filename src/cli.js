@@ -48,6 +48,12 @@ function resolveAndEnsureConfigFile(options, { suppressIfExists = true } = {}) {
     return configPath;
 }
 
+function beautifyCss(css) {
+    return beautify(css)
+        // 시작 공백을 제외한 중간 공백을 1개로 치환.
+        .replace(/(?<=\S)[ ]{2,}/g, ' ');
+}
+
 program
     .name('lightstair-css')
     .description('LightStair CSS CLI tool for generating color values')
@@ -69,9 +75,11 @@ program
         try {
             const config = loadConfig(configPath);
 
-            const css = bakeFormat
-                ? beautify(generateBakedCSS(config, bakeFormat))
-                : beautify(generateCSS(config));
+            const rawCss = bakeFormat
+                ? generateBakedCSS(config, bakeFormat)
+                : generateCSS(config);
+
+            const css = beautifyCss(rawCss);
 
             const outputDir = dirname(outputPath);
             mkdirSync(outputDir, { recursive: true });
