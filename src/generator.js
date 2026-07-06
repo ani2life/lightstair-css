@@ -13,7 +13,7 @@ export function generateCSS(config) {
 
     function generateSteps(prefix, baseL, gap, steps, startNumber, dir) {
         return Array.from({ length: steps }, (_, i) =>
-            `--${prefix}${i + startNumber}: oklch(clamp(0, var(--${baseL}) + (${gap} * ${i} * var(--${dir})), 1) var(--base-c) var(--base-h));`
+            `--${prefix}-${i + startNumber}: oklch(clamp(0, var(--${baseL}) + (${gap} * ${i} * var(--${dir})), 1) var(--base-c) var(--base-h));`
         ).join('\n');
     }
 
@@ -86,7 +86,7 @@ export function generateBakedCSS(config, format) {
     function generateSteps(prefix, baseL, gap, steps, startNumber, dir) {
         return Array.from({ length: steps }, (_, i) => {
             const l = clamp(baseL + gap * i * dir);
-            return `--${prefix}${i + startNumber}: ${formatColor(l, base_c, base_h)};`;
+            return `--${prefix}-${i + startNumber}: ${formatColor(l, base_c, base_h)};`;
         }).join('\n');
     }
 

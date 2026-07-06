@@ -103,6 +103,10 @@
         console.error('[Preview] Failed to load config:', err.message);
     }
 
+    function varName(prefix, num) {
+        return `--${prefix}-${num}`;
+    }
+
     function applyConfig(config) {
         const {
             tx_l_steps, bg_l_steps, bd_l_steps,
@@ -119,12 +123,12 @@
             const bgContainer = clone.querySelector('.card-backgrounds');
             const borderContainer = clone.querySelector('.card-borders');
 
-            card.style.backgroundColor = `var(--${bg_prefix}${n + bg_start_number})`;
+            card.style.backgroundColor = `var(${varName(bg_prefix, n + bg_start_number)})`;
 
             for (let i = 0; i < tx_l_steps; i++) {
                 const div = document.createElement('div');
                 div.className = 'tx-step';
-                const txVar = `--${tx_prefix}${i + tx_start_number}`;
+                const txVar = varName(tx_prefix, i + tx_start_number);
                 div.style.color = `var(${txVar})`;
                 div.textContent = txVar;
                 textContainer.appendChild(div);
@@ -133,7 +137,7 @@
             for (let j = 0; j < bg_l_steps; j++) {
                 const div = document.createElement('div');
                 div.className = 'bg-step';
-                const bgVar = `--${bg_prefix}${j + bg_start_number}`;
+                const bgVar = varName(bg_prefix, j + bg_start_number);
                 div.style.backgroundColor = `var(${bgVar})`;
                 div.textContent = bgVar;
                 bgContainer.appendChild(div);
@@ -142,7 +146,7 @@
             for (let k = 0; k < bd_l_steps; k++) {
                 const div = document.createElement('div');
                 div.className = 'bd-step';
-                const bdVar = `--${bd_prefix}${k + bd_start_number}`;
+                const bdVar = varName(bd_prefix, k + bd_start_number);
                 div.style.border = `1px solid var(${bdVar})`;
                 div.textContent = bdVar;
                 borderContainer.appendChild(div);
@@ -167,9 +171,9 @@
                     const clone = document.importNode(template.content, true);
                     const card = clone.querySelector('.combo-card');
 
-                    const txVar = `--${tx_prefix}${tx + tx_start_number}`;
-                    const bgVar = `--${bg_prefix}${bg + bg_start_number}`;
-                    const bdVar = `--${bd_prefix}${bd + bd_start_number}`;
+                    const txVar = varName(tx_prefix, tx + tx_start_number);
+                    const bgVar = varName(bg_prefix, bg + bg_start_number);
+                    const bdVar = varName(bd_prefix, bd + bd_start_number);
                     card.style.color = `var(${txVar})`;
                     card.style.backgroundColor = `var(${bgVar})`;
                     card.style.border = `1px solid var(${bdVar})`;
