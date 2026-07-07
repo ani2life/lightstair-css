@@ -2,52 +2,55 @@ import Color from 'colorjs.io';
 
 export function generateCSS(config) {
     const {
-        tx_c, tx_h,
-        bg_c, bg_h,
-        bd_c, bd_h,
-        tx_l, bg_l, bd_l,
-        dark_tx_l, dark_bg_l, dark_bd_l,
+        tx_base_c, tx_base_h,
+        bg_base_c, bg_base_h,
+        bd_base_c, bd_base_h,
+        tx_init_l, bg_init_l, bd_init_l,
+        dark_tx_init_l, dark_bg_init_l, dark_bd_init_l,
         tx_l_gap, bg_l_gap, bd_l_gap,
         tx_l_steps, bg_l_steps, bd_l_steps,
         tx_prefix, bg_prefix, bd_prefix,
         tx_start_number, bg_start_number, bd_start_number,
     } = config;
 
-    function generateSteps(prefix, baseL, gap, steps, startNumber, dir) {
+    function generateSteps(prefix, gap, steps, startNumber) {
         return Array.from({ length: steps }, (_, i) =>
-            `--${prefix}-${i + startNumber}: oklch(clamp(0, var(--${baseL}) + (${gap} * ${i} * var(--${dir})), 1) var(--${prefix}-c) var(--${prefix}-h));`
+            `--${prefix}-${i + startNumber}:
+                oklch(clamp(0, var(--${prefix}-init-l) + (${gap} * ${i} * var(--${prefix}-l-dir)), 1)
+                var(--${prefix}-base-c)
+                var(--${prefix}-base-h));`
         ).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, `${tx_prefix}-l`, tx_l_gap, tx_l_steps, tx_start_number, `${tx_prefix}-l-dir`);
-    const bgSteps = generateSteps(bg_prefix, `${bg_prefix}-l`, bg_l_gap, bg_l_steps, bg_start_number, `${bg_prefix}-l-dir`);
-    const bdSteps = generateSteps(bd_prefix, `${bd_prefix}-l`, bd_l_gap, bd_l_steps, bd_start_number, `${bd_prefix}-l-dir`);
+    const txSteps = generateSteps(tx_prefix, tx_l_gap, tx_l_steps, tx_start_number);
+    const bgSteps = generateSteps(bg_prefix, bg_l_gap, bg_l_steps, bg_start_number);
+    const bdSteps = generateSteps(bd_prefix, bd_l_gap, bd_l_steps, bd_start_number);
 
     return /* css */`
         :root {
-            --${tx_prefix}-c: ${tx_c};
-            --${tx_prefix}-h: ${tx_h};
-            --${bg_prefix}-c: ${bg_c};
-            --${bg_prefix}-h: ${bg_h};
-            --${bd_prefix}-c: ${bd_c};
-            --${bd_prefix}-h: ${bd_h};
-
             --${tx_prefix}-l-dir: 1;
             --${bg_prefix}-l-dir: -1;
             --${bd_prefix}-l-dir: -1;
 
-            --${tx_prefix}-l: ${tx_l};
-            --${bg_prefix}-l: ${bg_l};
-            --${bd_prefix}-l: ${bd_l};
+            --${tx_prefix}-base-c: ${tx_base_c};
+            --${tx_prefix}-base-h: ${tx_base_h};
+            --${bg_prefix}-base-c: ${bg_base_c};
+            --${bg_prefix}-base-h: ${bg_base_h};
+            --${bd_prefix}-base-c: ${bd_base_c};
+            --${bd_prefix}-base-h: ${bd_base_h};
+
+            --${tx_prefix}-init-l: ${tx_init_l};
+            --${bg_prefix}-init-l: ${bg_init_l};
+            --${bd_prefix}-init-l: ${bd_init_l};
 
             @media (prefers-color-scheme: dark) {
                 --${tx_prefix}-l-dir: -1;
                 --${bg_prefix}-l-dir: 1;
                 --${bd_prefix}-l-dir: 1;
 
-                --${tx_prefix}-l: ${dark_tx_l};
-                --${bg_prefix}-l: ${dark_bg_l};
-                --${bd_prefix}-l: ${dark_bd_l};
+                --${tx_prefix}-init-l: ${dark_tx_init_l};
+                --${bg_prefix}-init-l: ${dark_bg_init_l};
+                --${bd_prefix}-init-l: ${dark_bd_init_l};
             }
 
             ${txSteps}
@@ -59,11 +62,11 @@ export function generateCSS(config) {
 
 export function generateBakedCSS(config, format) {
     const {
-        tx_c, tx_h,
-        bg_c, bg_h,
-        bd_c, bd_h,
-        tx_l, bg_l, bd_l,
-        dark_tx_l, dark_bg_l, dark_bd_l,
+        tx_base_c, tx_base_h,
+        bg_base_c, bg_base_h,
+        bd_base_c, bd_base_h,
+        tx_init_l, bg_init_l, bd_init_l,
+        dark_tx_init_l, dark_bg_init_l, dark_bd_init_l,
         tx_l_gap, bg_l_gap, bd_l_gap,
         tx_l_steps, bg_l_steps, bd_l_steps,
         tx_prefix, bg_prefix, bd_prefix,
@@ -94,13 +97,13 @@ export function generateBakedCSS(config, format) {
         }).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, tx_l, tx_l_gap, tx_l_steps, tx_start_number, TX_DIR, tx_c, tx_h);
-    const bgSteps = generateSteps(bg_prefix, bg_l, bg_l_gap, bg_l_steps, bg_start_number, BG_DIR, bg_c, bg_h);
-    const bdSteps = generateSteps(bd_prefix, bd_l, bd_l_gap, bd_l_steps, bd_start_number, BD_DIR, bd_c, bd_h);
+    const txSteps = generateSteps(tx_prefix, tx_init_l, tx_l_gap, tx_l_steps, tx_start_number, TX_DIR, tx_base_c, tx_base_h);
+    const bgSteps = generateSteps(bg_prefix, bg_init_l, bg_l_gap, bg_l_steps, bg_start_number, BG_DIR, bg_base_c, bg_base_h);
+    const bdSteps = generateSteps(bd_prefix, bd_init_l, bd_l_gap, bd_l_steps, bd_start_number, BD_DIR, bd_base_c, bd_base_h);
 
-    const txStepsDark = generateSteps(tx_prefix, dark_tx_l, tx_l_gap, tx_l_steps, tx_start_number, -TX_DIR, tx_c, tx_h);
-    const bgStepsDark = generateSteps(bg_prefix, dark_bg_l, bg_l_gap, bg_l_steps, bg_start_number, -BG_DIR, bg_c, bg_h);
-    const bdStepsDark = generateSteps(bd_prefix, dark_bd_l, bd_l_gap, bd_l_steps, bd_start_number, -BD_DIR, bd_c, bd_h);
+    const txStepsDark = generateSteps(tx_prefix, dark_tx_init_l, tx_l_gap, tx_l_steps, tx_start_number, -TX_DIR, tx_base_c, tx_base_h);
+    const bgStepsDark = generateSteps(bg_prefix, dark_bg_init_l, bg_l_gap, bg_l_steps, bg_start_number, -BG_DIR, bg_base_c, bg_base_h);
+    const bdStepsDark = generateSteps(bd_prefix, dark_bd_init_l, bd_l_gap, bd_l_steps, bd_start_number, -BD_DIR, bd_base_c, bd_base_h);
 
     return /* css */`
         :root {
