@@ -34,7 +34,3 @@ bd_l_steps: 4 # 테두리 밝기 단계
 tx_prefix: tx # 글자 색상 CSS 변수 접두어
 bg_prefix: bg # 배경 색상 CSS 변수 접두어
 bd_prefix: bd # 테두리 색상 CSS 변수 접두어
-
-tx_start_number: 1 # 글자 색상 CSS 변수 시작 번호
-bg_start_number: 1 # 배경 색상 CSS 변수 시작 번호
-bd_start_number: 1 # 테두리 색상 CSS 변수 시작 번호
