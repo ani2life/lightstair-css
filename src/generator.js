@@ -8,30 +8,30 @@ export function generateCSS(config) {
         tx_init_l, bg_init_l, bd_init_l,
         dark_tx_init_l, dark_bg_init_l, dark_bd_init_l,
         tx_l_gap, bg_l_gap, bd_l_gap,
+        dark_tx_l_gap, dark_bg_l_gap, dark_bd_l_gap,
         tx_l_steps, bg_l_steps, bd_l_steps,
         tx_prefix, bg_prefix, bd_prefix,
         tx_start_number, bg_start_number, bd_start_number,
     } = config;
 
-    function generateSteps(prefix, gap, steps, startNumber) {
-        return Array.from({ length: steps }, (_, i) =>
-            `--${prefix}-${i + startNumber}:
-                oklch(clamp(0, var(--${prefix}-init-l) + (${gap} * ${i} * var(--${prefix}-l-dir)), 1)
-                var(--${prefix}-base-c)
-                var(--${prefix}-base-h));`
-        ).join('\n');
+    function generateSteps(prefix, steps, startNumber) {
+        const initL = `var(--${prefix}-init-l)`;
+        const lGap = `var(--${prefix}-l-gap)`;
+        const baseC = `var(--${prefix}-base-c)`;
+        const baseH = `var(--${prefix}-base-h)`;
+
+        return Array.from({ length: steps }, (_, i) => {
+            const calcL = `clamp(0, ${initL} + (${lGap} * ${i + 1}), 1)`;
+            return `--${prefix}-${i + startNumber}: oklch(${calcL} ${baseC} ${baseH});`
+        }).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, tx_l_gap, tx_l_steps, tx_start_number);
-    const bgSteps = generateSteps(bg_prefix, bg_l_gap, bg_l_steps, bg_start_number);
-    const bdSteps = generateSteps(bd_prefix, bd_l_gap, bd_l_steps, bd_start_number);
+    const txSteps = generateSteps(tx_prefix, tx_l_steps, tx_start_number);
+    const bgSteps = generateSteps(bg_prefix, bg_l_steps, bg_start_number);
+    const bdSteps = generateSteps(bd_prefix, bd_l_steps, bd_start_number);
 
     return /* css */`
         :root {
-            --${tx_prefix}-l-dir: 1;
-            --${bg_prefix}-l-dir: -1;
-            --${bd_prefix}-l-dir: -1;
-
             --${tx_prefix}-base-c: ${tx_base_c};
             --${tx_prefix}-base-h: ${tx_base_h};
             --${bg_prefix}-base-c: ${bg_base_c};
@@ -43,14 +43,18 @@ export function generateCSS(config) {
             --${bg_prefix}-init-l: ${bg_init_l};
             --${bd_prefix}-init-l: ${bd_init_l};
 
-            @media (prefers-color-scheme: dark) {
-                --${tx_prefix}-l-dir: -1;
-                --${bg_prefix}-l-dir: 1;
-                --${bd_prefix}-l-dir: 1;
+            --${tx_prefix}-l-gap: ${tx_l_gap};
+            --${bg_prefix}-l-gap: ${bg_l_gap};
+            --${bd_prefix}-l-gap: ${bd_l_gap};
 
+            @media (prefers-color-scheme: dark) {
                 --${tx_prefix}-init-l: ${dark_tx_init_l};
                 --${bg_prefix}-init-l: ${dark_bg_init_l};
                 --${bd_prefix}-init-l: ${dark_bd_init_l};
+
+                --${tx_prefix}-l-gap: ${dark_tx_l_gap};
+                --${bg_prefix}-l-gap: ${dark_bg_l_gap};
+                --${bd_prefix}-l-gap: ${dark_bd_l_gap};
             }
 
             ${txSteps}
@@ -68,14 +72,11 @@ export function generateBakedCSS(config, format) {
         tx_init_l, bg_init_l, bd_init_l,
         dark_tx_init_l, dark_bg_init_l, dark_bd_init_l,
         tx_l_gap, bg_l_gap, bd_l_gap,
+        dark_tx_l_gap, dark_bg_l_gap, dark_bd_l_gap,
         tx_l_steps, bg_l_steps, bd_l_steps,
         tx_prefix, bg_prefix, bd_prefix,
         tx_start_number, bg_start_number, bd_start_number,
     } = config;
-
-    const TX_DIR = 1;
-    const BG_DIR = -1;
-    const BD_DIR = -1;
 
     function clamp(val) {
         return Math.min(1, Math.max(0, val));
@@ -90,20 +91,20 @@ export function generateBakedCSS(config, format) {
         return color.toString({ format: format });
     }
 
-    function generateSteps(prefix, baseL, gap, steps, startNumber, dir, c, h) {
+    function generateSteps(prefix, initL, gap, steps, startNumber, c, h) {
         return Array.from({ length: steps }, (_, i) => {
-            const l = clamp(baseL + gap * i * dir);
+            const l = clamp(initL + gap * (i + 1));
             return `--${prefix}-${i + startNumber}: ${formatColor(l, c, h)};`;
         }).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, tx_init_l, tx_l_gap, tx_l_steps, tx_start_number, TX_DIR, tx_base_c, tx_base_h);
-    const bgSteps = generateSteps(bg_prefix, bg_init_l, bg_l_gap, bg_l_steps, bg_start_number, BG_DIR, bg_base_c, bg_base_h);
-    const bdSteps = generateSteps(bd_prefix, bd_init_l, bd_l_gap, bd_l_steps, bd_start_number, BD_DIR, bd_base_c, bd_base_h);
+    const txSteps = generateSteps(tx_prefix, tx_init_l, tx_l_gap, tx_l_steps, tx_start_number, tx_base_c, tx_base_h);
+    const bgSteps = generateSteps(bg_prefix, bg_init_l, bg_l_gap, bg_l_steps, bg_start_number, bg_base_c, bg_base_h);
+    const bdSteps = generateSteps(bd_prefix, bd_init_l, bd_l_gap, bd_l_steps, bd_start_number, bd_base_c, bd_base_h);
 
-    const txStepsDark = generateSteps(tx_prefix, dark_tx_init_l, tx_l_gap, tx_l_steps, tx_start_number, -TX_DIR, tx_base_c, tx_base_h);
-    const bgStepsDark = generateSteps(bg_prefix, dark_bg_init_l, bg_l_gap, bg_l_steps, bg_start_number, -BG_DIR, bg_base_c, bg_base_h);
-    const bdStepsDark = generateSteps(bd_prefix, dark_bd_init_l, bd_l_gap, bd_l_steps, bd_start_number, -BD_DIR, bd_base_c, bd_base_h);
+    const txStepsDark = generateSteps(tx_prefix, dark_tx_init_l, dark_tx_l_gap, tx_l_steps, tx_start_number, tx_base_c, tx_base_h);
+    const bgStepsDark = generateSteps(bg_prefix, dark_bg_init_l, dark_bg_l_gap, bg_l_steps, bg_start_number, bg_base_c, bg_base_h);
+    const bdStepsDark = generateSteps(bd_prefix, dark_bd_init_l, dark_bd_l_gap, bd_l_steps, bd_start_number, bd_base_c, bd_base_h);
 
     return /* css */`
         :root {
