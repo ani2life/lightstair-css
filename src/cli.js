@@ -5,7 +5,6 @@ import http from 'node:http';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
 import { beautify } from '@toolsnap/css-minifier-tool';
-import open from 'open';
 import { generateCSS, generateBakedCSS } from './generator.js';
 
 const SRC_DIR = dirname(fileURLToPath(import.meta.url));
@@ -100,7 +99,7 @@ program.command('init').description('create a default lightstair-css.yml config 
 
 program
     .command('preview')
-    .description('open preview page in browser')
+    .description('run the preview server')
     .addOption(configOption)
     .option('-p, --port <number>', 'port number to use (default: random)')
     .action((options) => {
@@ -161,7 +160,6 @@ program
             const actualPort = server.address().port;
             console.log(`[OK] Preview server running at http://localhost:${actualPort}`);
             console.log('Press Ctrl+C to stop the server.');
-            open(`http://localhost:${actualPort}`);
         });
 
         process.on('SIGINT', () => {
