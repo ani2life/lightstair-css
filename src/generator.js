@@ -20,9 +20,8 @@ export function generateCSS(config) {
         const baseH = `var(--${prefix}-base-h)`;
 
         return Array.from({ length: steps }, (_, i) => {
-            const step = i + 1;
-            const calcL = `clamp(0, ${initL} + (${lGap} * ${step}), 1)`;
-            return `--${prefix}-${step}: oklch(${calcL} ${baseC} ${baseH});`
+            const calcL = `clamp(0, ${initL} + (${lGap} * ${i}), 1)`;
+            return `--${prefix}-${i + 1}: oklch(${calcL} ${baseC} ${baseH});`
         }).join('\n');
     }
 
@@ -92,9 +91,8 @@ export function generateBakedCSS(config, format) {
 
     function generateSteps(prefix, initL, gap, steps, c, h) {
         return Array.from({ length: steps }, (_, i) => {
-            const step = i + 1;
-            const l = clamp(initL + gap * step);
-            return `--${prefix}-${step}: ${formatColor(l, c, h)};`;
+            const l = clamp(initL + gap * i);
+            return `--${prefix}-${i + 1}: ${formatColor(l, c, h)};`;
         }).join('\n');
     }
 
