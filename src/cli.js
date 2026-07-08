@@ -126,7 +126,7 @@ program
             if (req.url === '/css') {
                 try {
                     const config = loadConfig(configPath);
-                    const css = beautify(generateCSS(config));
+                    const css = generateCSS(config, { isPreview: true });
                     res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
                     res.end(css, 'utf-8');
                 } catch (err) {

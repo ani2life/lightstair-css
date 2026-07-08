@@ -1,6 +1,6 @@
 import Color from 'colorjs.io';
 
-export function generateCSS(config) {
+export function generateCSS(config, { isPreview = false } = {}) {
     const {
         tx_base_c, tx_base_h,
         bg_base_c, bg_base_h,
@@ -25,42 +25,79 @@ export function generateCSS(config) {
         }).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, tx_l_steps);
-    const bgSteps = generateSteps(bg_prefix, bg_l_steps);
-    const bdSteps = generateSteps(bd_prefix, bd_l_steps);
+    const txStepsCss = generateSteps(tx_prefix, tx_l_steps);
+    const bgStepsCss = generateSteps(bg_prefix, bg_l_steps);
+    const bdStepsCss = generateSteps(bd_prefix, bd_l_steps);
 
-    return /* css */`
-        :root {
-            --${tx_prefix}-base-c: ${tx_base_c};
-            --${tx_prefix}-base-h: ${tx_base_h};
-            --${bg_prefix}-base-c: ${bg_base_c};
-            --${bg_prefix}-base-h: ${bg_base_h};
-            --${bd_prefix}-base-c: ${bd_base_c};
-            --${bd_prefix}-base-h: ${bd_base_h};
+    const baseCss = /* css */`
+        --${tx_prefix}-base-c: ${tx_base_c};
+        --${tx_prefix}-base-h: ${tx_base_h};
+        --${bg_prefix}-base-c: ${bg_base_c};
+        --${bg_prefix}-base-h: ${bg_base_h};
+        --${bd_prefix}-base-c: ${bd_base_c};
+        --${bd_prefix}-base-h: ${bd_base_h};
+    `;
 
-            --${tx_prefix}-init-l: ${tx_init_l};
-            --${bg_prefix}-init-l: ${bg_init_l};
-            --${bd_prefix}-init-l: ${bd_init_l};
+    const lightModeCss = /* css */`
+        --${tx_prefix}-init-l: ${tx_init_l};
+        --${bg_prefix}-init-l: ${bg_init_l};
+        --${bd_prefix}-init-l: ${bd_init_l};
 
-            --${tx_prefix}-l-gap: ${tx_l_gap};
-            --${bg_prefix}-l-gap: ${bg_l_gap};
-            --${bd_prefix}-l-gap: ${bd_l_gap};
+        --${tx_prefix}-l-gap: ${tx_l_gap};
+        --${bg_prefix}-l-gap: ${bg_l_gap};
+        --${bd_prefix}-l-gap: ${bd_l_gap};
+    `;
 
-            @media (prefers-color-scheme: dark) {
-                --${tx_prefix}-init-l: ${dark_tx_init_l};
-                --${bg_prefix}-init-l: ${dark_bg_init_l};
-                --${bd_prefix}-init-l: ${dark_bd_init_l};
+    const darkModeCss = /* css */`
+        --${tx_prefix}-init-l: ${dark_tx_init_l};
+        --${bg_prefix}-init-l: ${dark_bg_init_l};
+        --${bd_prefix}-init-l: ${dark_bd_init_l};
 
-                --${tx_prefix}-l-gap: ${dark_tx_l_gap};
-                --${bg_prefix}-l-gap: ${dark_bg_l_gap};
-                --${bd_prefix}-l-gap: ${dark_bd_l_gap};
+        --${tx_prefix}-l-gap: ${dark_tx_l_gap};
+        --${bg_prefix}-l-gap: ${dark_bg_l_gap};
+        --${bd_prefix}-l-gap: ${dark_bd_l_gap};
+    `;
+
+    if (isPreview) {
+        return /* css */`
+            :root {
+                ${baseCss}
             }
 
-            ${txSteps}
-            ${bgSteps}
-            ${bdSteps}
-        }
-    `;
+            .light-mode,
+            .dark-mode {
+                ${txStepsCss}
+                ${bgStepsCss}
+                ${bdStepsCss}
+            }
+
+            .light-mode {
+                color-scheme: light;
+                ${lightModeCss}
+            }
+
+            .dark-mode {
+                color-scheme: dark;
+                ${darkModeCss}
+            }
+        `;
+    } else {
+        return /* css */`
+            :root {
+                ${baseCss}
+
+                ${lightModeCss}
+
+                @media (prefers-color-scheme: dark) {
+                    ${darkModeCss}
+                }
+
+                ${txStepsCss}
+                ${bgStepsCss}
+                ${bdStepsCss}
+            }
+        `;
+    }
 }
 
 export function generateBakedCSS(config, format) {

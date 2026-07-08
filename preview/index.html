@@ -21,12 +21,42 @@
         padding: 2rem;
     }
 
-    main > section {
+    h1 {
+        margin: 0 0 2rem 0;
+    }
+
+    main {
         display: flex;
-        flex-direction: row;
         flex-wrap: wrap;
-        gap: 1.5rem;
-        margin-top: 2rem;
+        gap: 2rem;
+
+        .mode-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            flex: 1;
+            min-width: 300px;
+            padding: 1rem;
+            border-radius: 8px;
+            color: canvastext;
+            background-color: canvas;
+
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+            @media (prefers-color-scheme: dark) {
+                box-shadow: 0 2px 12px rgba(255, 255, 255, 0.15);
+            }
+
+            h3 {
+                font-size: 1.5rem;
+                margin: 0;
+            }
+
+            section {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1.5rem;
+            }
+        }
     }
 
     .overview-card {
@@ -34,8 +64,6 @@
         gap: 0.5rem;
 
         padding: 1.5rem;
-        /* border-width: 1px;
-        border-style: solid; */
         border-radius: 8px;
 
         .overview-card__txs,
@@ -47,7 +75,7 @@
         }
 
         .overview-card__txs > .tx-step {
-            /* font-size: 0.9rem; */
+            font-size: 0.9rem;
         }
 
         .overview-card__bgs > .bg-step,
@@ -84,8 +112,16 @@
 </header>
 
 <main>
-    <section id="overviewSection"></section>
-    <section id="comboSection"></section>
+    <div class="mode-column light-mode">
+        <h3>☀️ Light Mode</h3>
+        <section id="overview-light"></section>
+        <section id="combo-light"></section>
+    </div>
+    <div class="mode-column dark-mode">
+        <h3>🌙 Dark Mode</h3>
+        <section id="overview-dark"></section>
+        <section id="combo-dark"></section>
+    </div>
 </main>
 
 <template id="overviewCard">
@@ -108,8 +144,10 @@
             throw new Error('Config fetch failed: ' + res.status);
         }
         const config = await res.json();
-        applyConfig(config);
-        applyComboCards(config);
+        renderOverviewCards(config, 'overview-light');
+        renderOverviewCards(config, 'overview-dark');
+        renderComboCards(config, 'combo-light');
+        renderComboCards(config, 'combo-dark');
     } catch (err) {
         console.error('[Preview] Failed to load config:', err.message);
     }
@@ -118,7 +156,7 @@
         return `--${prefix}-${num}`;
     }
 
-    function applyConfig(config) {
+    function renderOverviewCards(config, containerId) {
         const {
             tx_l_steps, bg_l_steps, bd_l_steps,
             tx_prefix, bg_prefix, bd_prefix,
@@ -163,11 +201,11 @@
                 borderContainer.appendChild(div);
             }
 
-            document.getElementById('overviewSection').appendChild(clone);
+            document.getElementById(containerId).appendChild(clone);
         }
     }
 
-    function applyComboCards(config) {
+    function renderComboCards(config, containerId) {
         const {
             tx_l_steps, bg_l_steps, bd_l_steps,
             tx_prefix, bg_prefix, bd_prefix,
@@ -190,7 +228,7 @@
                     card.style.borderColor = `var(${bdVar})`;
                     card.innerHTML = `${txVar}<br>${bgVar}<br>${bdVar}<br>`;
 
-                    document.getElementById('comboSection').appendChild(clone);
+                    document.getElementById(containerId).appendChild(clone);
                 }
             }
         }
