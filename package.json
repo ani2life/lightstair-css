@@ -25,8 +25,7 @@
     "node": ">=18.0.0"
   },
   "bin": {
-    "lightstair-css": "./bin/cli.js",
-    "lightstair": "./bin/cli.js"
+    "lightstair-css": "./bin/cli.js"
   },
   "exports": {
     ".": "./src/cli.js",
