@@ -4,229 +4,433 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Style Preview | LightStair CSS</title>
+<title>LightStair-CSS</title>
 <link href="/css" rel="stylesheet">
 <style>
-    :root {
-        color-scheme: light dark;
-    }
+:root {
+    color-scheme: light dark;
+}
 
-    html {
-        font-size: 16px;
-    }
+html {
+    font-size: 16px;
+}
 
-    body {
-        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Course New", monospace;
-        margin: 0;
-        padding: 2rem;
-    }
+body {
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Course New", monospace;
+    margin: 0;
+    padding: 2rem;
+}
 
-    h1 {
-        margin: 0 0 2rem 0;
-    }
+h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 0 0 2rem 0;
 
-    main {
+    img {
+        display: block;
+        width: 1.2em;
+        height: 1.2em;
+    }
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    .theme-column {
         display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-
-        .mode-column {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            flex: 1;
-            min-width: 300px;
-            padding: 1rem;
-            border-radius: 8px;
-            color: canvastext;
-            background-color: canvas;
-
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-            @media (prefers-color-scheme: dark) {
-                box-shadow: 0 2px 12px rgba(255, 255, 255, 0.15);
-            }
-
-            h3 {
-                font-size: 1.5rem;
-                margin: 0;
-            }
-
-            section {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 1.5rem;
-            }
-        }
-    }
-
-    .overview-card {
-        display: flex;
-        gap: 0.5rem;
-
+        flex-direction: column;
+        gap: 1.5rem;
+        flex: 1;
+        min-width: 300px;
         padding: 1.5rem;
         border-radius: 8px;
+        color: canvastext;
+        background-color: canvas;
 
-        .overview-card__txs,
-        .overview-card__bgs,
-        .overview-card__bds {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        @media (prefers-color-scheme: dark) {
+            box-shadow: 0 2px 12px rgba(255, 255, 255, 0.15);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        section {
             display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .overview-card__txs > .tx-step {
-            font-size: 0.9rem;
+        hr {
+            border: none;
+            height: 1px;
+            margin: 0 -1.5em;
+            background-color: currentColor;
+            opacity: 0.2;
+        }
+    }
+}
+
+.overview-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    border-radius: 8px;
+
+    .overview-card__stairs {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        /* horizontal dots */
+        &:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 100%;
+            transform: translate(-50%, calc(1rem - 1.5px));
+            width: 3px;
+            height: 3px;
+            background: currentColor;
+            border-radius: 50%;
+            box-shadow:
+                -10px 0 0 0 currentColor,
+                10px 0 0 0 currentColor;
         }
 
-        .overview-card__bgs > .bg-step,
-        .overview-card__bds > .bd-step {
+        .stair {
+            --checkbox-opacity: 0.3;
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
             box-sizing: border-box;
-            display: flex;
-            align-items: center;
-            height: 2rem;
-            padding: 0 1rem;
-            border-radius: 4px;
             font-size: 0.8rem;
-        }
+            padding: 0.5rem 1.5rem 0.5rem 2rem;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            position: relative;
+            cursor: pointer;
 
-        .overview-card__bds > .bd-step {
-            border-width: 1px;
-            border-style: solid;
+            /* checkbox background */
+            &::before {
+                opacity: var(--checkbox-opacity);
+
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0.5rem;
+                transform: translateY(-50%);
+
+                width: 1rem;
+                height: 1rem;
+
+                background-color: canvastext;
+                border-radius: 50%;
+            }
+            /* checkbox mark */
+            &::after {
+                opacity: var(--checkbox-opacity);
+
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0.85rem;
+                transform: translateY(-60%) rotate(45deg);
+
+                width: 0.24rem;
+                height: 0.4rem;
+
+                border: solid canvas;
+                border-width: 0 0.1rem 0.1rem 0;
+            }
+
+            &:hover {
+                outline: 1px solid canvastext;
+            }
+
+            &:has(> input[type="radio"]:checked) {
+                --checkbox-opacity: 1;
+            }
+
+            input[type="radio"] {
+                position: absolute;
+                width: 0;
+                height: 0;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            > span {
+                white-space: nowrap;
+
+                &:nth-of-type(2) {
+                    width: 20ch;
+                }
+                &:nth-of-type(3) {
+                    width: 25ch;
+                }
+                &:nth-of-type(4) {
+                    width: 7ch;
+                }
+            }
         }
     }
+}
 
-    .combo-card {
-        padding: 1rem;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        border-width: 1px;
-        border-style: solid;
-    }
+.combo-card {
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border-width: 1px;
+    border-style: solid;
+}
 </style>
-
 </head>
 <body>
 
 <header>
-    <h1>Style Preview</h1>
+    <h1>
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="/icon-dark.svg">
+            <img src="/icon-light.svg" alt="">
+        </picture>
+        LightStair-CSS
+    </h1>
 </header>
 
 <main>
-    <div class="mode-column light-mode">
-        <h3>☀️ Light Mode</h3>
+    <div class="theme-column light-theme">
+        <h3>☀️ Light Theme</h3>
         <section id="overview-light"></section>
+        <hr>
         <section id="combo-light"></section>
     </div>
-    <div class="mode-column dark-mode">
-        <h3>🌙 Dark Mode</h3>
+    <div class="theme-column dark-theme">
+        <h3>🌙 Dark Theme</h3>
         <section id="overview-dark"></section>
+        <hr>
         <section id="combo-dark"></section>
     </div>
 </main>
 
-<template id="overviewCard">
+<template id="overview-card">
     <div class="overview-card">
-        <div class="overview-card__txs"></div>
-        <div class="overview-card__bgs"></div>
-        <div class="overview-card__bds"></div>
+        <div class="overview-card__stairs" data-color-type="tx"></div>
+        <div class="overview-card__stairs" data-color-type="bg"></div>
+        <div class="overview-card__stairs" data-color-type="bd"></div>
     </div>
 </template>
 
-<template id="comboCard">
+<template id="overview-card-stair">
+    <label class="stair">
+        <input type="radio">
+        <span>color-var</span>
+        <span>oklch(0 0 0)</span>
+        <span>rgb(0 0 0)</span>
+        <span>#000000</span>
+    </label>
+</template>
+
+<template id="combo-card">
     <div class="combo-card"></div>
 </template>
 
 <script>
 (async function () {
     try {
-        const res = await fetch('/config');
-        if (!res.ok) {
-            throw new Error('Config fetch failed: ' + res.status);
+        const [configRes, colorVarsRes] = await Promise.all([
+            fetch('/config'),
+            fetch('/color-vars'),
+        ]);
+
+        if (!configRes.ok) {
+            throw new Error(`Config fetch failed: ${configRes.status}`);
         }
-        const config = await res.json();
-        renderOverviewCards(config, 'overview-light');
-        renderOverviewCards(config, 'overview-dark');
-        renderComboCards(config, 'combo-light');
-        renderComboCards(config, 'combo-dark');
+        if (!colorVarsRes.ok) {
+            throw new Error(`Color vars fetch failed: ${colorVarsRes.status}`);
+        }
+
+        const config = await configRes.json();
+        const colorVars = await colorVarsRes.json();
+
+        renderOverviewCards(config, colorVars, 'overview-light', false);
+        renderOverviewCards(config, colorVars, 'overview-dark', true);
+        renderComboCards(config, 'combo-light', false);
+        renderComboCards(config, 'combo-dark', true);
     } catch (err) {
-        console.error('[Preview] Failed to load config:', err.message);
+        console.error('[Preview] Failed to load data:', err.message);
     }
 
-    function varName(prefix, num) {
+    function colorVarName(prefix, num) {
         return `--${prefix}-${num}`;
     }
 
-    function renderOverviewCards(config, containerId) {
-        const {
-            tx_l_steps, bg_l_steps, bd_l_steps,
-            tx_prefix, bg_prefix, bd_prefix,
-            tx_start_number, bg_start_number, bd_start_number,
-        } = config;
+    const lastCheckedRadio = new Map();
 
-        const template = document.getElementById('overviewCard');
+    function createStairElement(colorType, theme, colorData, styleProp, colorVar) {
+        const radioName = `${colorType}-stair-${theme}`;
 
-        for (let n = 0; n < bg_l_steps; n++) {
-            const clone = document.importNode(template.content, true);
-            const card = clone.querySelector('.overview-card');
-            const textContainer = clone.querySelector('.overview-card__txs');
-            const bgContainer = clone.querySelector('.overview-card__bgs');
-            const borderContainer = clone.querySelector('.overview-card__bds');
+        const template = document.getElementById('overview-card-stair');
+        const clone = document.importNode(template.content, true);
+        const label = clone.querySelector('.stair');
+        const radio = clone.querySelector('input[type="radio"]');
 
-            card.style.backgroundColor = `var(${varName(bg_prefix, n + bg_start_number)})`;
+        label.dataset.theme = theme;
+        label.dataset.colorType = colorType;
 
-            for (let i = 0; i < tx_l_steps; i++) {
-                const div = document.createElement('div');
-                div.className = 'tx-step';
-                const txVar = varName(tx_prefix, i + tx_start_number);
-                div.style.color = `var(${txVar})`;
-                div.textContent = txVar;
-                textContainer.appendChild(div);
+        radio.name = radioName;
+        radio.dataset.theme = theme;
+        radio.dataset.colorType = colorType;
+        radio.dataset.colorVar = colorVar;
+
+        label.style[styleProp] = `var(${colorVar})`;
+        const spans = label.querySelectorAll(':scope > span');
+        spans[0].textContent = colorVar;
+        spans[1].textContent = colorData.oklch;
+        spans[2].textContent = colorData.rgb;
+        spans[3].textContent = colorData.hex;
+
+        radio.addEventListener('click', () => {
+            const groupName = radio.name;
+            const lastRadio = lastCheckedRadio.get(groupName);
+
+            if (lastRadio === radio) {
+                // 마지막 체크 요소가 동일하면 체크 해제
+                radio.checked = false;
+                lastCheckedRadio.delete(groupName);
+            } else {
+                lastCheckedRadio.set(groupName, radio);
             }
 
-            for (let j = 0; j < bg_l_steps; j++) {
-                const div = document.createElement('div');
-                div.className = 'bg-step';
-                const bgVar = varName(bg_prefix, j + bg_start_number);
-                div.style.backgroundColor = `var(${bgVar})`;
-                div.textContent = bgVar;
-                bgContainer.appendChild(div);
-            }
+            document.querySelectorAll(`.stair[data-theme="${theme}"]:not([data-color-type="${colorType}"])`).forEach(stair => {
+                stair.style[styleProp] = radio.checked ? label.style[styleProp] : '';
+            });
 
-            for (let k = 0; k < bd_l_steps; k++) {
-                const div = document.createElement('div');
-                div.className = 'bd-step';
-                const bdVar = varName(bd_prefix, k + bd_start_number);
-                div.style.borderColor = `var(${bdVar})`;
-                div.textContent = bdVar;
-                borderContainer.appendChild(div);
-            }
+            filterComboCards();
+        });
 
-            document.getElementById(containerId).appendChild(clone);
-        }
+        return clone;
     }
 
-    function renderComboCards(config, containerId) {
+    function filterComboCards() {
+        const filterData = {};
+
+        for (const [groupName, radio] of lastCheckedRadio) {
+            const theme = radio.dataset.theme;
+            const colorType = radio.dataset.colorType;
+            const colorVar = radio.dataset.colorVar;
+
+            if (!filterData[theme]) {
+                filterData[theme] = {};
+            }
+            filterData[theme][colorType] = colorVar;
+        }
+
+        document.querySelectorAll('.combo-card').forEach(card => {
+            let isVisible = true;
+            const cardTheme = card.dataset.theme;
+            const filter = filterData[cardTheme];
+
+            if (filter) {
+                if ('tx' in filter && card.dataset.txColorVar !== filter.tx) {
+                    isVisible = false;
+                }
+                if ('bg' in filter && card.dataset.bgColorVar !== filter.bg) {
+                    isVisible = false;
+                }
+                if ('bd' in filter && card.dataset.bdColorVar !== filter.bd) {
+                    isVisible = false;
+                }
+            }
+
+            card.style.display = isVisible ? '' : 'none';
+        });
+    }
+
+    async function renderOverviewCards(config, colorVars, containerId, isDark = false) {
         const {
             tx_l_steps, bg_l_steps, bd_l_steps,
             tx_prefix, bg_prefix, bd_prefix,
-            tx_start_number, bg_start_number, bd_start_number,
         } = config;
 
-        const template = document.getElementById('comboCard');
+        const theme = isDark ? 'dark' : 'light';
 
-        for (let bg = 0; bg < bg_l_steps; bg++) {
-            for (let tx = 0; tx < tx_l_steps; tx++) {
-                for (let bd = 0; bd < bd_l_steps; bd++) {
+        const template = document.getElementById('overview-card');
+        const clone = document.importNode(template.content, true);
+        const card = clone.querySelector('.overview-card');
+
+        const configs = [
+            {
+                colorType: 'tx',
+                prefix: tx_prefix,
+                steps: tx_l_steps,
+                styleProp: 'color',
+            },
+            {
+                colorType: 'bg',
+                prefix: bg_prefix,
+                steps: bg_l_steps,
+                styleProp: 'backgroundColor',
+            },
+            {
+                colorType: 'bd',
+                prefix: bd_prefix,
+                steps: bd_l_steps,
+                styleProp: 'borderColor',
+            },
+        ];
+
+        for (const { colorType, prefix, steps, styleProp, container } of configs) {
+            for (let i = 1; i <= steps; i++) {
+                const colorVar = colorVarName(prefix, i);
+                const colorData = colorVars[colorVar][theme];
+                const container = clone.querySelector(`.overview-card__stairs[data-color-type="${colorType}"]`);
+                container.appendChild(
+                    createStairElement(colorType, theme, colorData, styleProp, colorVar)
+                );
+            }
+        }
+
+        document.getElementById(containerId).appendChild(clone);
+    }
+
+    function renderComboCards(config, containerId, isDark = false) {
+        const {
+            tx_l_steps, bg_l_steps, bd_l_steps,
+            tx_prefix, bg_prefix, bd_prefix,
+        } = config;
+
+        const theme = isDark ? 'dark' : 'light';
+
+        const template = document.getElementById('combo-card');
+
+        for (let bg = 1; bg <= bg_l_steps; bg++) {
+            for (let tx = 1; tx <= tx_l_steps; tx++) {
+                for (let bd = 1; bd <= bd_l_steps; bd++) {
                     const clone = document.importNode(template.content, true);
                     const card = clone.querySelector('.combo-card');
 
-                    const txVar = varName(tx_prefix, tx + tx_start_number);
-                    const bgVar = varName(bg_prefix, bg + bg_start_number);
-                    const bdVar = varName(bd_prefix, bd + bd_start_number);
+                    const txVar = colorVarName(tx_prefix, tx);
+                    const bgVar = colorVarName(bg_prefix, bg);
+                    const bdVar = colorVarName(bd_prefix, bd);
                     card.style.color = `var(${txVar})`;
                     card.style.backgroundColor = `var(${bgVar})`;
                     card.style.borderColor = `var(${bdVar})`;
                     card.innerHTML = `${txVar}<br>${bgVar}<br>${bdVar}<br>`;
+
+                    card.dataset.theme = theme;
+                    card.dataset.txColorVar = txVar;
+                    card.dataset.bgColorVar = bgVar;
+                    card.dataset.bdColorVar = bdVar;
 
                     document.getElementById(containerId).appendChild(clone);
                 }

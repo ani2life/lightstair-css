@@ -1,11 +1,11 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
 import { beautify } from '@toolsnap/css-minifier-tool';
-import { generateCSS, generateBakedCSS } from './generator.js';
+import { generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
 
 const SRC_DIR = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CONFIG_FILE = 'lightstair-css.yml';
@@ -148,6 +148,37 @@ program
                     console.error(err.message);
                     res.writeHead(500);
                     res.end(`Error: ${err.message}`, 'utf-8');
+                }
+                return;
+            }
+
+            if (req.url === '/color-vars') {
+                try {
+                    const config = loadConfig(configPath);
+                    const colorVars = generateColorVars(config);
+                    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+                    res.end(JSON.stringify(colorVars), 'utf-8');
+                } catch (err) {
+                    console.error(`[Error] Variables generation failed: ${configPath}`);
+                    console.error(err.message);
+                    res.writeHead(500);
+                    res.end(`Error: ${err.message}`, 'utf-8');
+                }
+                return;
+            }
+
+            if (req.url.endsWith('.svg') || req.url.endsWith('.ico')) {
+                const filePath = join(SRC_DIR, '..', 'preview', req.url.replace(/^\//, ''));
+                const contentType = req.url.endsWith('.svg')
+                    ? 'image/svg+xml'
+                    : 'image/x-icon';
+                try {
+                    const content = readFileSync(filePath);
+                    res.writeHead(200, { 'Content-Type': contentType });
+                    res.end(content);
+                } catch {
+                    res.writeHead(404);
+                    res.end('Not Found');
                 }
                 return;
             }
