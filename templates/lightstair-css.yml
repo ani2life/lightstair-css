@@ -1,5 +1,8 @@
 # ================================================
 # L, C, H 값은 OKLCH 색상 공간을 기준으로 합니다.
+# - L (Lightness, 명도): 0 ~ 1
+# - C (Chroma, 채도): 0 ~ 약 0.4
+# - H (Hue, 색상): 0 ~ 360 (각도, deg 단위)
 # ================================================
 
 tx_base_c: 0.01 # 기본 글자 채도(Chroma)
@@ -31,6 +34,24 @@ tx_l_steps: 4 # 글자 밝기 단계
 bg_l_steps: 4 # 배경 밝기 단계
 bd_l_steps: 4 # 테두리 밝기 단계
 
-tx_prefix: tx # 글자 색상 CSS 변수 접두어
-bg_prefix: bg # 배경 색상 CSS 변수 접두어
-bd_prefix: bd # 테두리 색상 CSS 변수 접두어
+tx_prefix: tx # 글자색 CSS 변수 접두어
+bg_prefix: bg # 배경색 CSS 변수 접두어
+bd_prefix: bd # 테두리색 CSS 변수 접두어
+
+# ================================================
+# 미리보기 페이지의 글자색과 배경색
+# ================================================
+
+preview_tx_l: 0.22 # 미리보기 글자 밝기
+preview_tx_c: 0 # 미리보기 글자 채도
+preview_tx_h: 0 # 미리보기 글자 색상
+preview_bg_l: 1 # 미리보기 배경 밝기
+preview_bg_c: 0 # 미리보기 배경 채도
+preview_bg_h: 0 # 미리보기 배경 색상
+
+dark_preview_tx_l: 0.94 # 다크모드 미리보기 글자 밝기
+dark_preview_tx_c: 0 # 다크모드 미리보기 글자 채도
+dark_preview_tx_h: 0 # 다크모드 미리보기 글자 색상
+dark_preview_bg_l: 0.18 # 다크모드 미리보기 배경 밝기
+dark_preview_bg_c: 0 # 다크모드 미리보기 배경 채도
+dark_preview_bg_h: 0 # 다크모드 미리보기 배경 색상

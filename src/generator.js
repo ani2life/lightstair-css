@@ -59,8 +59,24 @@ export function generateCSS(config, { isPreview = false } = {}) {
     `;
 
     if (isPreview) {
+        const {
+            preview_tx_l, preview_tx_c, preview_tx_h,
+            preview_bg_l, preview_bg_c, preview_bg_h,
+            dark_preview_tx_l, dark_preview_tx_c, dark_preview_tx_h,
+            dark_preview_bg_l, dark_preview_bg_c, dark_preview_bg_h,
+        } = config;
+
+        const previewColorVars = `
+            --preview-tx-color: oklch(${preview_tx_l} ${preview_tx_c} ${preview_tx_h});
+            --preview-bg-color: oklch(${preview_bg_l} ${preview_bg_c} ${preview_bg_h});
+            --dark-preview-tx-color: oklch(${dark_preview_tx_l} ${dark_preview_tx_c} ${dark_preview_tx_h});
+            --dark-preview-bg-color: oklch(${dark_preview_bg_l} ${dark_preview_bg_c} ${dark_preview_bg_h});
+        `;
+
         return /* css */`
             :root {
+                ${previewColorVars}
+
                 ${baseCss}
             }
 
