@@ -120,6 +120,21 @@ function clamp(min, val, max) {
     return Math.max(min, Math.min(val, max));
 }
 
+function formatColor(l, c, h) {
+    const color = new Color({ spaceId: 'oklch', coords: [l, c, h] });
+    return {
+        oklch: color.toString({
+            format: 'oklch',
+            coords: ['<number>', '<number>', '<number>']
+        }),
+        rgb: color.toString({
+            format: 'rgb',
+            coords: ['<number>[0, 255]', '<number>[0, 255]', '<number>[0, 255]']
+        }),
+        hex: color.toString({ format: 'hex' }),
+    };
+}
+
 export function generateBakedCSS(config, format) {
     const {
         tx_base_c, tx_base_h,
@@ -133,20 +148,20 @@ export function generateBakedCSS(config, format) {
         tx_prefix, bg_prefix, bd_prefix,
     } = config;
 
-    function generateSteps(prefix, initL, gap, steps, c, h) {
+    function generateSteps(prefix, initL, gap, steps, c, h, format) {
         return Array.from({ length: steps }, (_, i) => {
             const l = clamp(0, initL + gap * i, 1);
-            return `--${prefix}-${i + 1}: oklch(${l}, ${c}, ${h}});`;
+            return `--${prefix}-${i + 1}: ${formatColor(l, c, h)[format]};`;
         }).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, tx_init_l, tx_l_gap, tx_l_steps, tx_base_c, tx_base_h);
-    const bgSteps = generateSteps(bg_prefix, bg_init_l, bg_l_gap, bg_l_steps, bg_base_c, bg_base_h);
-    const bdSteps = generateSteps(bd_prefix, bd_init_l, bd_l_gap, bd_l_steps, bd_base_c, bd_base_h);
+    const txSteps = generateSteps(tx_prefix, tx_init_l, tx_l_gap, tx_l_steps, tx_base_c, tx_base_h, format);
+    const bgSteps = generateSteps(bg_prefix, bg_init_l, bg_l_gap, bg_l_steps, bg_base_c, bg_base_h, format);
+    const bdSteps = generateSteps(bd_prefix, bd_init_l, bd_l_gap, bd_l_steps, bd_base_c, bd_base_h, format);
 
-    const txStepsDark = generateSteps(tx_prefix, dark_tx_init_l, dark_tx_l_gap, tx_l_steps, tx_base_c, tx_base_h);
-    const bgStepsDark = generateSteps(bg_prefix, dark_bg_init_l, dark_bg_l_gap, bg_l_steps, bg_base_c, bg_base_h);
-    const bdStepsDark = generateSteps(bd_prefix, dark_bd_init_l, dark_bd_l_gap, bd_l_steps, bd_base_c, bd_base_h);
+    const txStepsDark = generateSteps(tx_prefix, dark_tx_init_l, dark_tx_l_gap, tx_l_steps, tx_base_c, tx_base_h, format);
+    const bgStepsDark = generateSteps(bg_prefix, dark_bg_init_l, dark_bg_l_gap, bg_l_steps, bg_base_c, bg_base_h, format);
+    const bdStepsDark = generateSteps(bd_prefix, dark_bd_init_l, dark_bd_l_gap, bd_l_steps, bd_base_c, bd_base_h, format);
 
     return /* css */`
         :root {
@@ -177,21 +192,6 @@ export function generateColorVars(config) {
     } = config;
 
     const result = {};
-
-    function formatColor(l, c, h) {
-        const color = new Color({ spaceId: 'oklch', coords: [l, c, h] });
-        return {
-            oklch: color.toString({
-                format: 'oklch',
-                coords: ['<number>', '<number>', '<number>']
-            }),
-            rgb: color.toString({
-                format: 'rgb',
-                coords: ['<number>[0, 255]', '<number>[0, 255]', '<number>[0, 255]']
-            }),
-            hex: color.toString({ format: 'hex' }),
-        };
-    }
 
     function addSteps(prefix, lightInitL, lightGap, darkInitL, darkGap, steps, c, h) {
         for (let i = 0; i < steps; i++) {
