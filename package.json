@@ -1,7 +1,7 @@
 {
   "name": "lightstair-css",
-  "version": "0.1.0",
-  "description": "글자색, 배경색, 테두리색의 단계별 밝기를 CSS 코드로 생성하는 CLI 패키지",
+  "version": "0.2.0",
+  "description": "OKLCH 색상 공간을 기반으로 글자·배경·테두리 색의 밝기 단계를 설정하여 CSS 파일을 생성하는 CLI 도구.",
   "keywords": [
     "color",
     "css",
@@ -26,10 +26,6 @@
   },
   "bin": {
     "lightstair-css": "./bin/cli.js"
-  },
-  "exports": {
-    ".": "./src/cli.js",
-    "./generator": "./src/generator.js"
   },
   "dependencies": {
     "@toolsnap/css-minifier-tool": "^1.0.0",
