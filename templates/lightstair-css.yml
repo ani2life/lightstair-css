@@ -5,30 +5,30 @@
 # - H (Hue, 색상): 0 ~ 360 (각도, deg 단위)
 # ================================================
 
-tx_base_c: 0.01 # 기본 글자 채도(Chroma)
-tx_base_h: 250 # 기본 글자 색상(Hue)
+tx_base_c: 0.01 # 기본 글자 채도
+tx_base_h: 250 # 기본 글자 색상
 
-bg_base_c: 0.01 # 기본 배경 채도(Chroma)
-bg_base_h: 250 # 기본 배경 색상(Hue)
+bg_base_c: 0.01 # 기본 배경 채도
+bg_base_h: 250 # 기본 배경 색상
 
-bd_base_c: 0.01 # 기본 테두리 채도(Chroma)
-bd_base_h: 250 # 기본 테두리 색상(Hue)
+bd_base_c: 0.01 # 기본 테두리 채도
+bd_base_h: 250 # 기본 테두리 색상
 
-tx_init_l: 0.31 # 초기 글자 밝기(Lightness)
-bg_init_l: 0.96 # 초기 배경 밝기(Lightness)
-bd_init_l: 0.92 # 초기 테두리 밝기(Lightness)
+tx_init_l: 0.31 # 초기 글자 밝기
+bg_init_l: 0.96 # 초기 배경 밝기
+bd_init_l: 0.88 # 초기 테두리 밝기
 
 dark_tx_init_l: 0.85 # 다크모드 초기 글자 밝기
 dark_bg_init_l: 0.22 # 다크모드 초기 배경 밝기
-dark_bd_init_l: 0.26 # 다크모드 초기 테두리 밝기
+dark_bd_init_l: 0.38 # 다크모드 초기 테두리 밝기
 
 tx_l_gap: 0.09 # 글자 밝기 간격
 bg_l_gap: -0.04 # 배경 밝기 간격
-bd_l_gap: -0.04 # 테두리 밝기 간격
+bd_l_gap: -0.08 # 테두리 밝기 간격
 
 dark_tx_l_gap: -0.09 # 다크모드 글자 밝기 간격
 dark_bg_l_gap: 0.04 # 다크모드 배경 밝기 간격
-dark_bd_l_gap: 0.04 # 다크모드 테두리 밝기 간격
+dark_bd_l_gap: 0.10 # 다크모드 테두리 밝기 간격
 
 tx_l_steps: 4 # 글자 밝기 단계
 bg_l_steps: 4 # 배경 밝기 단계
