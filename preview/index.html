@@ -82,6 +82,11 @@ main {
 }
 
 .overview-card {
+    --col-width-1: auto;
+    --col-width-2: auto;
+    --col-width-3: auto;
+    --col-width-4: auto;
+
     position: relative;
     display: flex;
     flex-direction: column;
@@ -177,14 +182,17 @@ main {
             > span {
                 white-space: nowrap;
 
+                &:nth-of-type(1) {
+                    width: var(--col-width-1);
+                }
                 &:nth-of-type(2) {
-                    width: 20ch;
+                    width: var(--col-width-2);
                 }
                 &:nth-of-type(3) {
-                    width: 25ch;
+                    width: var(--col-width-3);
                 }
                 &:nth-of-type(4) {
-                    width: 7ch;
+                    width: var(--col-width-4);
                 }
             }
         }
@@ -371,7 +379,6 @@ main {
 
         const template = document.getElementById('overview-card');
         const clone = document.importNode(template.content, true);
-        const card = clone.querySelector('.overview-card');
 
         const configs = [
             {
@@ -403,6 +410,23 @@ main {
                     createStairElement(colorType, theme, colorData, styleProp, colorVar)
                 );
             }
+        }
+
+        // 컬럼 너비 계산
+        {
+            const card = clone.querySelector('.overview-card');
+            const maxLen = [0, 0, 0, 0];
+
+            card.querySelectorAll('.stair').forEach(stair => {
+                stair.querySelectorAll(':scope > span').forEach((span, i) => {
+                    maxLen[i] = Math.max(maxLen[i], span.textContent.length);
+                });
+            });
+
+            card.style.setProperty('--col-width-1', `${maxLen[0]}ch`);
+            card.style.setProperty('--col-width-2', `${maxLen[1]}ch`);
+            card.style.setProperty('--col-width-3', `${maxLen[2]}ch`);
+            card.style.setProperty('--col-width-4', `${maxLen[3]}ch`);
         }
 
         document.getElementById(containerId).appendChild(clone);
