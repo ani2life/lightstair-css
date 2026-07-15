@@ -1,6 +1,6 @@
 {
   "name": "lightstair-css",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "OKLCH 색상 공간을 기반으로 글자·배경·테두리 색의 밝기 단계를 설정하여 CSS 파일을 생성하는 CLI 도구.",
   "keywords": [
     "color",
