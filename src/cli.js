@@ -1,29 +1,15 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SRC_DIR, DEFAULT_CONFIG_FILE, DEFAULT_CONFIG_PATH } from './constants.js';
 import http from 'node:http';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
 import { beautify } from '@toolsnap/css-minifier-tool';
-import { generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
-
-const SRC_DIR = dirname(fileURLToPath(import.meta.url));
-const DEFAULT_CONFIG_FILE = 'lightstair-css.yml';
-const DEFAULT_CONFIG_PATH = resolve(SRC_DIR, '..', 'templates', DEFAULT_CONFIG_FILE);
+import { buildConfig, generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
 
 const program = new Command();
 const configOption = new Option('-c, --config <path>', 'path to configuration file');
-
-function loadConfig(configPath) {
-    const raw = readFileSync(configPath, 'utf-8');
-    const userConfig = parse(raw);
-
-    const defaultRaw = readFileSync(DEFAULT_CONFIG_PATH, 'utf-8');
-    const defaultConfig = parse(defaultRaw);
-
-    const config = Object.assign({}, defaultConfig, userConfig);
-    return config;
-}
 
 function ensureConfigFile(configPath, { suppressIfExists = false } = {}) {
     const targetPath = resolve(configPath);
@@ -72,7 +58,7 @@ program
         })();
 
         try {
-            const config = loadConfig(configPath);
+            const config = buildConfig(configPath);
 
             const rawCss = bakeFormat
                 ? generateBakedCSS(config, bakeFormat)
@@ -125,7 +111,7 @@ program
 
             if (req.url === '/css') {
                 try {
-                    const config = loadConfig(configPath);
+                    const config = buildConfig(configPath);
                     const css = generateCSS(config, { isPreview: true });
                     res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
                     res.end(css, 'utf-8');
@@ -140,7 +126,7 @@ program
 
             if (req.url === '/config') {
                 try {
-                    const config = loadConfig(configPath);
+                    const config = buildConfig(configPath);
                     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
                     res.end(JSON.stringify(config), 'utf-8');
                 } catch (err) {
@@ -154,7 +140,7 @@ program
 
             if (req.url === '/color-vars') {
                 try {
-                    const config = loadConfig(configPath);
+                    const config = buildConfig(configPath);
                     const colorVars = generateColorVars(config);
                     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
                     res.end(JSON.stringify(colorVars), 'utf-8');
