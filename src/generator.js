@@ -19,6 +19,13 @@ export function buildConfig(configPath) {
     return config;
 }
 
+/**
+ * 설정 객체를 기반으로 CSS 변수 문자열을 생성합니다.
+ * @param {object} config - 설정 객체
+ * @param {object} [options] - 옵션 객체
+ * @param {boolean} [options.isPreview=false] - 미리보기 모드 여부
+ * @returns {string} 생성된 CSS 문자열
+ */
 export function generateCSS(config, { isPreview = false } = {}) {
     const {
         tx_base_c, tx_base_h,
@@ -135,10 +142,24 @@ export function generateCSS(config, { isPreview = false } = {}) {
     }
 }
 
+/**
+ * 값을 최소값과 최대값 사이로 제한합니다.
+ * @param {number} min - 최소값
+ * @param {number} val - 제한할 값
+ * @param {number} max - 최대값
+ * @returns {number} 제한된 값
+ */
 function clamp(min, val, max) {
     return Math.max(min, Math.min(val, max));
 }
 
+/**
+ * OKLCH 색상을 oklch, rgb, hex 형식으로 변환합니다.
+ * @param {number} l - 밝기 (Lightness)
+ * @param {number} c - 채도 (Chroma)
+ * @param {number} h - 색상 (Hue)
+ * @returns {{ oklch: string, rgb: string, hex: string }} 각 형식으로 포맷된 색상 문자열
+ */
 function formatColor(l, c, h) {
     const color = new Color({ spaceId: 'oklch', coords: [l, c, h] });
     return {
@@ -154,6 +175,13 @@ function formatColor(l, c, h) {
     };
 }
 
+/**
+ * 설정 객체를 기반으로 bake된 CSS 변수 문자열을 생성합니다.
+ * 실제 색상 값(oklch/rgb/hex)이 이미 계산되어 포함된 CSS를 반환합니다.
+ * @param {object} config - 설정 객체
+ * @param {('oklch' | 'rgb' | 'hex')} format - 색상 포맷
+ * @returns {string} 생성된 CSS 문자열
+ */
 export function generateBakedCSS(config, format) {
     const {
         tx_base_c, tx_base_h,
@@ -197,6 +225,12 @@ export function generateBakedCSS(config, format) {
     `;
 }
 
+/**
+ * 설정 객체를 기반으로 색상 변수 객체를 생성합니다.
+ * 라이트/다크 테마별 색상 값을 포함하는 중첩 객체를 반환합니다.
+ * @param {object} config - 설정 객체
+ * @returns {object} 색상 변수를 담은 객체 (키: CSS 변수명, 값: { light, dark } 색상 정보)
+ */
 export function generateColorVars(config) {
     const {
         tx_base_c, tx_base_h,

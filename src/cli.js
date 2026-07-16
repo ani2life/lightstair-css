@@ -11,6 +11,12 @@ import { buildConfig, generateCSS, generateBakedCSS, generateColorVars } from '.
 const program = new Command();
 const configOption = new Option('-c, --config <path>', 'path to configuration file');
 
+/**
+ * 설정 파일이 존재하는지 확인하고, 없으면 기본 설정 파일을 복사합니다.
+ * @param {string} configPath - 설정 파일 대상 경로
+ * @param {object} [options] - 옵션 객체
+ * @param {boolean} [options.suppressIfExists=false] - 파일 존재 시 로그 출력 억제 여부
+ */
 function ensureConfigFile(configPath, { suppressIfExists = false } = {}) {
     const targetPath = resolve(configPath);
     if (existsSync(targetPath)) {
@@ -21,6 +27,14 @@ function ensureConfigFile(configPath, { suppressIfExists = false } = {}) {
     console.log(`[OK] Created: ${targetPath}`);
 }
 
+/**
+ * 옵션에서 설정 파일 경로를 해석하고, 기본 경로인 경우 파일을 생성합니다.
+ * @param {object} options - CLI 옵션 객체
+ * @param {string} [options.config] - 설정 파일 경로 (선택사항)
+ * @param {object} [options] - 옵션 객체
+ * @param {boolean} [options.suppressIfExists=true] - 파일 존재 시 로그 출력 억제 여부
+ * @returns {string} 해석된 설정 파일의 절대 경로
+ */
 function resolveAndEnsureConfigFile(options, { suppressIfExists = true } = {}) {
     const configPath = options.config === undefined
         ? resolve(process.cwd(), DEFAULT_CONFIG_FILE)
@@ -33,6 +47,11 @@ function resolveAndEnsureConfigFile(options, { suppressIfExists = true } = {}) {
     return configPath;
 }
 
+/**
+ * CSS 문자열을 보기 좋게 포맷팅합니다.
+ * @param {string} css - 포맷팅할 CSS 문자열
+ * @returns {string} 포맷팅된 CSS 문자열
+ */
 function beautifyCss(css) {
     return beautify(css)
         // 시작 공백을 제외한 중간 공백을 1개로 치환.
