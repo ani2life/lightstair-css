@@ -5,17 +5,6 @@ import { beautify } from '@toolsnap/css-minifier-tool';
 import { SRC_DIR, DEFAULT_CONFIG_PATH } from './constants.js';
 
 /**
- * CSS 문자열을 보기 좋게 포맷팅합니다.
- * @param {string} css - 포맷팅할 CSS 문자열
- * @returns {string} 포맷팅된 CSS 문자열
- */
-function beautifyCss(css) {
-    return beautify(css)
-        // 시작 공백을 제외한 중간 공백을 1개로 치환.
-        .replace(/(?<=\S)[ ]{2,}/g, ' ');
-}
-
-/**
  * 설정 파일과 기본값을 조합해 완성된 설정 객체를 반환합니다.
  * @param {string} configPath - 설정 파일 경로
  * @returns {object} 기본값이 모두 채워진 설정 객체
@@ -155,39 +144,6 @@ export function generateCSS(config, { isPreview = false } = {}) {
 }
 
 /**
- * 값을 최소값과 최대값 사이로 제한합니다.
- * @param {number} min - 최소값
- * @param {number} val - 제한할 값
- * @param {number} max - 최대값
- * @returns {number} 제한된 값
- */
-function clamp(min, val, max) {
-    return Math.max(min, Math.min(val, max));
-}
-
-/**
- * OKLCH 색상을 oklch, rgb, hex 형식으로 변환합니다.
- * @param {number} l - 밝기 (Lightness)
- * @param {number} c - 채도 (Chroma)
- * @param {number} h - 색상 (Hue)
- * @returns {{ oklch: string, rgb: string, hex: string }} 각 형식으로 포맷된 색상 문자열
- */
-function formatColor(l, c, h) {
-    const color = new Color({ spaceId: 'oklch', coords: [l, c, h] });
-    return {
-        oklch: color.toString({
-            format: 'oklch',
-            coords: ['<number>', '<number>', '<number>']
-        }),
-        rgb: color.toString({
-            format: 'rgb',
-            coords: ['<number>[0, 255]', '<number>[0, 255]', '<number>[0, 255]']
-        }),
-        hex: color.toString({ format: 'hex' }),
-    };
-}
-
-/**
  * 설정 객체를 기반으로 bake된 CSS 변수 문자열을 생성합니다.
  * 실제 색상 값(oklch/rgb/hex)이 이미 계산되어 포함된 CSS를 반환합니다.
  * @param {object} config - 설정 객체
@@ -276,4 +232,48 @@ export function generateColorVars(config) {
     addSteps(bd_prefix, bd_init_l, bd_l_gap, dark_bd_init_l, dark_bd_l_gap, bd_l_steps, bd_base_c, bd_base_h);
 
     return result;
+}
+
+/**
+ * CSS 문자열을 보기 좋게 포맷팅합니다.
+ * @param {string} css - 포맷팅할 CSS 문자열
+ * @returns {string} 포맷팅된 CSS 문자열
+ */
+function beautifyCss(css) {
+    return beautify(css)
+        // 시작 공백을 제외한 중간 공백을 1개로 치환.
+        .replace(/(?<=\S)[ ]{2,}/g, ' ');
+}
+
+/**
+ * 값을 최소값과 최대값 사이로 제한합니다.
+ * @param {number} min - 최소값
+ * @param {number} val - 제한할 값
+ * @param {number} max - 최대값
+ * @returns {number} 제한된 값
+ */
+function clamp(min, val, max) {
+    return Math.max(min, Math.min(val, max));
+}
+
+/**
+ * OKLCH 색상을 oklch, rgb, hex 형식으로 변환합니다.
+ * @param {number} l - 밝기 (Lightness)
+ * @param {number} c - 채도 (Chroma)
+ * @param {number} h - 색상 (Hue)
+ * @returns {{ oklch: string, rgb: string, hex: string }} 각 형식으로 포맷된 색상 문자열
+ */
+function formatColor(l, c, h) {
+    const color = new Color({ spaceId: 'oklch', coords: [l, c, h] });
+    return {
+        oklch: color.toString({
+            format: 'oklch',
+            coords: ['<number>', '<number>', '<number>']
+        }),
+        rgb: color.toString({
+            format: 'rgb',
+            coords: ['<number>[0, 255]', '<number>[0, 255]', '<number>[0, 255]']
+        }),
+        hex: color.toString({ format: 'hex' }),
+    };
 }
