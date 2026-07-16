@@ -1,7 +1,19 @@
 import Color from 'colorjs.io';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
+import { beautify } from '@toolsnap/css-minifier-tool';
 import { SRC_DIR, DEFAULT_CONFIG_PATH } from './constants.js';
+
+/**
+ * CSS 문자열을 보기 좋게 포맷팅합니다.
+ * @param {string} css - 포맷팅할 CSS 문자열
+ * @returns {string} 포맷팅된 CSS 문자열
+ */
+function beautifyCss(css) {
+    return beautify(css)
+        // 시작 공백을 제외한 중간 공백을 1개로 치환.
+        .replace(/(?<=\S)[ ]{2,}/g, ' ');
+}
 
 /**
  * 설정 파일과 기본값을 조합해 완성된 설정 객체를 반환합니다.
@@ -99,7 +111,7 @@ export function generateCSS(config, { isPreview = false } = {}) {
             --dark-preview-bg-color: oklch(${dark_preview_bg_l} ${dark_preview_bg_c} ${dark_preview_bg_h});
         `;
 
-        return /* css */`
+        return beautifyCss(/* css */`
             :root {
                 ${previewColorVars}
 
@@ -122,9 +134,9 @@ export function generateCSS(config, { isPreview = false } = {}) {
                 color-scheme: dark;
                 ${darkThemeCss}
             }
-        `;
+        `);
     } else {
-        return /* css */`
+        return beautifyCss(/* css */`
             :root {
                 ${baseCss}
 
@@ -138,7 +150,7 @@ export function generateCSS(config, { isPreview = false } = {}) {
                 ${bgStepsCss}
                 ${bdStepsCss}
             }
-        `;
+        `);
     }
 }
 
@@ -210,7 +222,7 @@ export function generateBakedCSS(config, format) {
     const bgStepsDark = generateSteps(bg_prefix, dark_bg_init_l, dark_bg_l_gap, bg_l_steps, bg_base_c, bg_base_h, format);
     const bdStepsDark = generateSteps(bd_prefix, dark_bd_init_l, dark_bd_l_gap, bd_l_steps, bd_base_c, bd_base_h, format);
 
-    return /* css */`
+    return beautifyCss(/* css */`
         :root {
             ${txSteps}
             ${bgSteps}
@@ -222,7 +234,7 @@ export function generateBakedCSS(config, format) {
                 ${bdStepsDark}
             }
         }
-    `;
+    `);
 }
 
 /**

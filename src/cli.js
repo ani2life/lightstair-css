@@ -5,7 +5,6 @@ import { SRC_DIR, DEFAULT_CONFIG_FILE, DEFAULT_CONFIG_PATH } from './constants.j
 import http from 'node:http';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
-import { beautify } from '@toolsnap/css-minifier-tool';
 import { buildConfig, generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
 
 const program = new Command();
@@ -47,17 +46,6 @@ function resolveAndEnsureConfigFile(options, { suppressIfExists = true } = {}) {
     return configPath;
 }
 
-/**
- * CSS 문자열을 보기 좋게 포맷팅합니다.
- * @param {string} css - 포맷팅할 CSS 문자열
- * @returns {string} 포맷팅된 CSS 문자열
- */
-function beautifyCss(css) {
-    return beautify(css)
-        // 시작 공백을 제외한 중간 공백을 1개로 치환.
-        .replace(/(?<=\S)[ ]{2,}/g, ' ');
-}
-
 program
     .name('lightstair-css')
     .description('LightStair CSS CLI tool for generating color values')
@@ -79,11 +67,9 @@ program
         try {
             const config = buildConfig(configPath);
 
-            const rawCss = bakeFormat
+            const css = bakeFormat
                 ? generateBakedCSS(config, bakeFormat)
                 : generateCSS(config);
-
-            const css = beautifyCss(rawCss);
 
             const outputDir = dirname(outputPath);
             mkdirSync(outputDir, { recursive: true });
