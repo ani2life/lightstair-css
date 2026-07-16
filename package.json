@@ -21,6 +21,9 @@
     "url": "https://github.com/ani2life/lightstair-css/issues"
   },
   "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
   "engines": {
     "node": ">=18.0.0"
   },

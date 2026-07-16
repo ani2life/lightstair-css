@@ -5,7 +5,8 @@ import { SRC_DIR, DEFAULT_CONFIG_FILE, DEFAULT_CONFIG_PATH } from './constants.j
 import http from 'node:http';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
-import { buildConfig, generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
+import { buildConfig } from './config.js';
+import { generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
 
 const program = new Command();
 const configOption = new Option('-c, --config <path>', 'path to configuration file');
