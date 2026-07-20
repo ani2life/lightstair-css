@@ -5,6 +5,7 @@ import { SRC_DIR, DEFAULT_CONFIG_FILE, DEFAULT_CONFIG_PATH } from './constants.j
 import http from 'node:http';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
+import chokidar from 'chokidar';
 import { buildConfig } from './config.js';
 import { generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
 
@@ -106,6 +107,18 @@ program
             process.exit(1);
         }
 
+        const clients = new Set();
+
+        function broadcast(event, data) {
+            const chunk = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+            for (const res of clients) {
+                if (!res.writableEnded) res.write(chunk);
+            }
+            for (const res of clients) {
+                if (res.writableEnded) clients.delete(res);
+            }
+        }
+
         const server = http.createServer((req, res) => {
             if (req.url === '/') {
                 const htmlPath = resolve(SRC_DIR, '..', 'preview', 'index.html');
@@ -159,6 +172,28 @@ program
                 return;
             }
 
+            if (req.url === '/sse') {
+                res.writeHead(200, {
+                    'Content-Type': 'text/event-stream',
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive',
+                });
+
+                clients.add(res);
+
+                // 30초 주기 heartbeat: 프록시/브라우저 타임아웃 방지
+                res.hbId = setInterval(() => {
+                    if (!res.writableEnded) res.write(': heartbeat\n\n');
+                }, 30000);
+
+                req.on('close', () => {
+                    clearInterval(res.hbId);
+                    clients.delete(res);
+                });
+
+                return;
+            }
+
             if (req.url.endsWith('.svg') || req.url.endsWith('.ico')) {
                 const filePath = join(SRC_DIR, '..', 'preview', req.url.replace(/^\//, ''));
                 const contentType = req.url.endsWith('.svg')
@@ -185,8 +220,25 @@ program
             console.log('Press Ctrl+C to stop the server.');
         });
 
+        // 설정 파일 변경 감지 (chokidar: atomic save 중복 이벤트 정규화)
+        const watcher = chokidar.watch(resolve(configPath), {
+            awaitWriteFinish: {
+                stabilityThreshold: 300,
+                pollInterval: 100,
+            },
+        });
+        watcher.on('change', () => {
+            broadcast('reload', 'Config changed.');
+        });
+
         process.on('SIGINT', () => {
             console.log('\nShutting down preview server...');
+            watcher.close();
+            for (const res of clients) {
+                clearInterval(res.hbId);
+                if (!res.writableEnded) res.end();
+            }
+            clients.clear();
             server.close();
             process.exit(0);
         });

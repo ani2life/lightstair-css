@@ -466,6 +466,17 @@ main {
             }
         }
     }
+
+    // SSE: 설정 파일 변경 감지 → 자동 새로고침
+    const evtSource = new EventSource('/sse');
+    evtSource.addEventListener('reload', (event) => {
+        console.log('[SSE] Reloading...', event.data);
+        evtSource.close();
+        location.reload();
+    });
+    evtSource.onerror = (err) => {
+        console.error('[SSE] Error:', err);
+    };
 })();
 </script>
 

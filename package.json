@@ -33,6 +33,7 @@
   "dependencies": {
     "@toolsnap/css-minifier-tool": "^1.0.0",
     "colorjs.io": "^0.6.1",
+    "chokidar": "^5.0.0",
     "commander": "^15.0.0",
     "open": "^11.0.0",
     "yaml": "^2.9.0"
