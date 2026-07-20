@@ -1,7 +1,7 @@
 import http from 'node:http';
 import chokidar from 'chokidar';
 import { ConfigFile } from '../ConfigFile.js';
-import { SSEManager } from './sse.js';
+import { SSEManager } from './SSEManager.js';
 import { createRouter } from './routes.js';
 
 /**
