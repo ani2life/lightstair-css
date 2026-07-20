@@ -6,7 +6,7 @@ import { Command, Option } from 'commander';
 import { parse } from 'yaml';
 import { buildConfig } from './config.js';
 import { generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
-import { createAndStartServer } from './server/index.js';
+import { PreviewServer } from './server/PreviewServer.js';
 
 const program = new Command();
 const configOption = new Option('-c, --config <path>', 'path to configuration file');
@@ -94,7 +94,7 @@ program
     .description('run the preview server')
     .addOption(configOption)
     .option('-p, --port <number>', 'port number to use (default: random)')
-    .action((options) => {
+    .action(async (options) => {
         const configPath = resolveAndEnsureConfigFile(options, { suppressIfExists: true });
 
         const port = options.port !== undefined
@@ -106,13 +106,12 @@ program
             process.exit(1);
         }
 
-        const { server, watcher, sse } = createAndStartServer(configPath, port);
+        const previewServer = new PreviewServer(configPath, port);
+        await previewServer.start();
 
-        process.on('SIGINT', () => {
+        process.on('SIGINT', async () => {
             console.log('\nShutting down preview server...');
-            watcher.close();
-            sse.cleanup();
-            server.close();
+            await previewServer.stop();
             process.exit(0);
         });
     });
