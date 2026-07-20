@@ -1,6 +1,6 @@
 import http from 'node:http';
 import chokidar from 'chokidar';
-import { buildConfig } from '../config.js';
+import { ConfigFile } from '../ConfigFile.js';
 import { SSEManager } from './sse.js';
 import { createRouter } from './routes.js';
 
@@ -9,6 +9,7 @@ import { createRouter } from './routes.js';
  */
 export class PreviewServer {
     #configPath;
+    #config;
     #port;
     #sse;
     #router;
@@ -21,6 +22,7 @@ export class PreviewServer {
      */
     constructor(configPath, port) {
         this.#configPath = configPath;
+        this.#config = new ConfigFile(configPath);
         this.#port = port;
         this.#sse = new SSEManager();
         this.#router = createRouter();
@@ -35,7 +37,8 @@ export class PreviewServer {
     async start() {
         return new Promise((resolve, reject) => {
             this.#server = http.createServer((req, res) => {
-                const config = buildConfig(this.#configPath);
+                // 설정 파일 실시간 반영을 위해 항상 다시 읽기
+                const config = this.#config.read();
 
                 if (req.url === '/') {
                     this.#router.handleIndex(res);

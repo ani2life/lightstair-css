@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { DEFAULT_CONFIG_FILE, DEFAULT_CONFIG_PATH } from './constants.js';
 import { Command, Option } from 'commander';
 import { parse } from 'yaml';
-import { buildConfig } from './config.js';
+import { ConfigFile } from './ConfigFile.js';
 import { generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
 import { PreviewServer } from './server/PreviewServer.js';
 
@@ -66,7 +66,7 @@ program
         })();
 
         try {
-            const config = buildConfig(configPath);
+            const config = new ConfigFile(configPath).read();
 
             const css = bakeFormat
                 ? generateBakedCSS(config, bakeFormat)
