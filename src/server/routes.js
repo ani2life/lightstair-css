@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve, extname, sep } from 'node:path';
-import { generateCSS, generateColorVars } from '../generator.js';
+import { generatePreviewCSS, generateColorVars } from '../generator.js';
 import { PREVIEW_DIR } from '../constants.js';
 
 const STATIC_CONTENT_TYPES = {
@@ -77,7 +77,7 @@ export function createRouter() {
             if (url === '/css') {
                 if (configMissing()) return;
                 try {
-                    const css = generateCSS(config, { isPreview: true });
+                    const css = generatePreviewCSS(config);
                     res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
                     res.end(css, 'utf-8');
                 } catch (err) {

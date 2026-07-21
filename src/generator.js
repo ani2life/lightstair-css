@@ -1,15 +1,19 @@
 import Color from 'colorjs.io';
 import { beautify } from '@toolsnap/css-minifier-tool';
-import { SRC_DIR } from './constants.js';
 
 /**
- * 설정 객체를 기반으로 CSS 변수 문자열을 생성합니다.
+ * CSS 조각 객체를 빌드합니다. generateCSS / generatePreviewCSS 에서 공통으로 사용합니다.
  * @param {object} config - 설정 객체
- * @param {object} [options] - 옵션 객체
- * @param {boolean} [options.isPreview=false] - 미리보기 모드 여부
- * @returns {string} 생성된 CSS 문자열
+ * @returns {{
+ *     baseCss: string
+ *     lightThemeCss: string
+ *     darkThemeCss: string
+ *     txStepsCss: string
+ *     bgStepsCss: string
+ *     bdStepsCss: string
+ * }}
  */
-export function generateCSS(config, { isPreview = false } = {}) {
+function buildCssParts(config) {
     const {
         tx_base_c, tx_base_h,
         bg_base_c, bg_base_h,
@@ -22,7 +26,10 @@ export function generateCSS(config, { isPreview = false } = {}) {
         tx_prefix, bg_prefix, bd_prefix,
     } = config;
 
-    function generateSteps(prefix, steps) {
+    /**
+     * 단계별 CSS 변수 문자열을 빌드합니다.
+     */
+    function buildSteps(prefix, steps) {
         const initL = `var(--${prefix}-init-l)`;
         const lGap = `var(--${prefix}-l-gap)`;
         const baseC = `var(--${prefix}-base-c)`;
@@ -33,10 +40,6 @@ export function generateCSS(config, { isPreview = false } = {}) {
             return `--${prefix}-${i + 1}: oklch(${calcL} ${baseC} ${baseH});`
         }).join('\n');
     }
-
-    const txStepsCss = generateSteps(tx_prefix, tx_l_steps);
-    const bgStepsCss = generateSteps(bg_prefix, bg_l_steps);
-    const bdStepsCss = generateSteps(bd_prefix, bd_l_steps);
 
     const baseCss = `
         --${tx_prefix}-base-c: ${tx_base_c};
@@ -67,62 +70,93 @@ export function generateCSS(config, { isPreview = false } = {}) {
         --${bd_prefix}-l-gap: ${dark_bd_l_gap};
     `;
 
-    if (isPreview) {
-        const {
-            preview_tx_l, preview_tx_c, preview_tx_h,
-            preview_bg_l, preview_bg_c, preview_bg_h,
-            dark_preview_tx_l, dark_preview_tx_c, dark_preview_tx_h,
-            dark_preview_bg_l, dark_preview_bg_c, dark_preview_bg_h,
-        } = config;
+    return {
+        baseCss: baseCss,
+        lightThemeCss: lightThemeCss,
+        darkThemeCss: darkThemeCss,
+        txStepsCss: buildSteps(tx_prefix, tx_l_steps),
+        bgStepsCss: buildSteps(bg_prefix, bg_l_steps),
+        bdStepsCss: buildSteps(bd_prefix, bd_l_steps),
+    };
+}
 
-        const previewColorVars = `
-            --preview-tx-color: oklch(${preview_tx_l} ${preview_tx_c} ${preview_tx_h});
-            --preview-bg-color: oklch(${preview_bg_l} ${preview_bg_c} ${preview_bg_h});
-            --dark-preview-tx-color: oklch(${dark_preview_tx_l} ${dark_preview_tx_c} ${dark_preview_tx_h});
-            --dark-preview-bg-color: oklch(${dark_preview_bg_l} ${dark_preview_bg_c} ${dark_preview_bg_h});
-        `;
+/**
+ * 설정 객체를 기반으로 CSS 변수 문자열을 생성합니다.
+ * @param {object} config - 설정 객체
+ * @returns {string} 생성된 CSS 문자열
+ */
+export function generateCSS(config) {
+    const {
+        baseCss, lightThemeCss, darkThemeCss,
+        txStepsCss, bgStepsCss, bdStepsCss,
+    } = buildCssParts(config);
 
-        return beautifyCss(/* css */`
-            :root {
-                ${previewColorVars}
+    return beautifyCss(/* css */`
+        :root {
+            ${baseCss}
+            ${lightThemeCss}
 
-                ${baseCss}
-            }
-
-            .light-theme,
-            .dark-theme {
-                ${txStepsCss}
-                ${bgStepsCss}
-                ${bdStepsCss}
-            }
-
-            .light-theme {
-                color-scheme: light;
-                ${lightThemeCss}
-            }
-
-            .dark-theme {
-                color-scheme: dark;
+            @media (prefers-color-scheme: dark) {
                 ${darkThemeCss}
             }
-        `);
-    } else {
-        return beautifyCss(/* css */`
-            :root {
-                ${baseCss}
 
-                ${lightThemeCss}
+            ${txStepsCss}
+            ${bgStepsCss}
+            ${bdStepsCss}
+        }
+    `);
+}
 
-                @media (prefers-color-scheme: dark) {
-                    ${darkThemeCss}
-                }
+/**
+ * 설정 객체를 기반으로 미리보기용 CSS 변수 문자열을 생성합니다.
+ * 미리보기 페이지에서 사용할 색상 변수 (preview-tx-color, preview-bg-color 등) 를 포함합니다.
+ * @param {object} config - 설정 객체
+ * @returns {string} 미리보기용 CSS 문자열
+ */
+export function generatePreviewCSS(config) {
+    const {
+        preview_tx_l, preview_tx_c, preview_tx_h,
+        preview_bg_l, preview_bg_c, preview_bg_h,
+        dark_preview_tx_l, dark_preview_tx_c, dark_preview_tx_h,
+        dark_preview_bg_l, dark_preview_bg_c, dark_preview_bg_h,
+    } = config;
 
-                ${txStepsCss}
-                ${bgStepsCss}
-                ${bdStepsCss}
-            }
-        `);
-    }
+    const previewColorVars = `
+        --preview-tx-color: oklch(${preview_tx_l} ${preview_tx_c} ${preview_tx_h});
+        --preview-bg-color: oklch(${preview_bg_l} ${preview_bg_c} ${preview_bg_h});
+        --dark-preview-tx-color: oklch(${dark_preview_tx_l} ${dark_preview_tx_c} ${dark_preview_tx_h});
+        --dark-preview-bg-color: oklch(${dark_preview_bg_l} ${dark_preview_bg_c} ${dark_preview_bg_h});
+    `;
+
+    const {
+        baseCss, lightThemeCss, darkThemeCss,
+        txStepsCss, bgStepsCss, bdStepsCss,
+    } = buildCssParts(config);
+
+    return beautifyCss(/* css */`
+        :root {
+            ${previewColorVars}
+
+            ${baseCss}
+        }
+
+        .light-theme,
+        .dark-theme {
+            ${txStepsCss}
+            ${bgStepsCss}
+            ${bdStepsCss}
+        }
+
+        .light-theme {
+            color-scheme: light;
+            ${lightThemeCss}
+        }
+
+        .dark-theme {
+            color-scheme: dark;
+            ${darkThemeCss}
+        }
+    `);
 }
 
 /**
@@ -145,20 +179,20 @@ export function generateBakedCSS(config, format) {
         tx_prefix, bg_prefix, bd_prefix,
     } = config;
 
-    function generateSteps(prefix, initL, gap, steps, c, h, format) {
+    function buildSteps(prefix, initL, gap, steps, c, h, format) {
         return Array.from({ length: steps }, (_, i) => {
             const l = clamp(0, initL + gap * i, 1);
             return `--${prefix}-${i + 1}: ${formatColor(l, c, h)[format]};`;
         }).join('\n');
     }
 
-    const txSteps = generateSteps(tx_prefix, tx_init_l, tx_l_gap, tx_l_steps, tx_base_c, tx_base_h, format);
-    const bgSteps = generateSteps(bg_prefix, bg_init_l, bg_l_gap, bg_l_steps, bg_base_c, bg_base_h, format);
-    const bdSteps = generateSteps(bd_prefix, bd_init_l, bd_l_gap, bd_l_steps, bd_base_c, bd_base_h, format);
+    const txSteps = buildSteps(tx_prefix, tx_init_l, tx_l_gap, tx_l_steps, tx_base_c, tx_base_h, format);
+    const bgSteps = buildSteps(bg_prefix, bg_init_l, bg_l_gap, bg_l_steps, bg_base_c, bg_base_h, format);
+    const bdSteps = buildSteps(bd_prefix, bd_init_l, bd_l_gap, bd_l_steps, bd_base_c, bd_base_h, format);
 
-    const txStepsDark = generateSteps(tx_prefix, dark_tx_init_l, dark_tx_l_gap, tx_l_steps, tx_base_c, tx_base_h, format);
-    const bgStepsDark = generateSteps(bg_prefix, dark_bg_init_l, dark_bg_l_gap, bg_l_steps, bg_base_c, bg_base_h, format);
-    const bdStepsDark = generateSteps(bd_prefix, dark_bd_init_l, dark_bd_l_gap, bd_l_steps, bd_base_c, bd_base_h, format);
+    const txStepsDark = buildSteps(tx_prefix, dark_tx_init_l, dark_tx_l_gap, tx_l_steps, tx_base_c, tx_base_h, format);
+    const bgStepsDark = buildSteps(bg_prefix, dark_bg_init_l, dark_bg_l_gap, bg_l_steps, bg_base_c, bg_base_h, format);
+    const bdStepsDark = buildSteps(bd_prefix, dark_bd_init_l, dark_bd_l_gap, bd_l_steps, bd_base_c, bd_base_h, format);
 
     return beautifyCss(/* css */`
         :root {
