@@ -120,3 +120,73 @@ lightstair-css preview
 # Start preview server with port and configuration file
 lightstair-css preview -p 3000 -c my-config.yml
 ```
+
+## API
+
+In addition to the CLI, you can use LightStair CSS directly in your JavaScript code.
+
+### Read Configuration File
+
+```js
+import { buildConfig } from 'lightstair-css';
+
+const config = buildConfig('./lightstair-css.yml');
+```
+
+Reads a YAML configuration file and returns a fully populated configuration object with all defaults applied.
+
+### Generate CSS
+
+```js
+import { generateCSS } from 'lightstair-css';
+
+const css = generateCSS(config);
+```
+
+Generates a CSS string based on the configuration object. The output uses dynamically computed CSS variable code.
+
+### Generate Baked CSS
+
+```js
+import { generateBakedCSS } from 'lightstair-css';
+
+const css = generateBakedCSS(config, 'oklch'); // or 'rgb', 'hex'
+```
+
+Generates CSS with pre-computed actual color values. Equivalent to the `--bake` CLI option.
+
+### Generate Color Variable Object
+
+```js
+import { generateColorVars } from 'lightstair-css';
+
+const colorVars = generateColorVars(config);
+```
+
+Returns an object containing color values for both light and dark themes.
+
+```js
+// Example output
+{
+    '--tx-1': { light: { oklch: '...', rgb: '...', hex: '...' }, dark: { ... } },
+    '--bg-1': { light: { ... }, dark: { ... } },
+    '--bd-1': { light: { ... }, dark: { ... } },
+}
+```
+
+### Full Example
+
+```js
+import * as LightstairCss from 'lightstair-css';
+
+// 1. Read configuration file
+const configPath = './lightstair-css.yml';
+const config = LightstairCss.buildConfig(configPath);
+
+// 2. Generate CSS
+const css = LightstairCss.generateCSS(config);
+
+// 3. Save to file
+import { writeFileSync } from 'node:fs';
+writeFileSync('./colors.css', css);
+```

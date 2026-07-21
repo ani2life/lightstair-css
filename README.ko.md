@@ -120,3 +120,73 @@ lightstair-css preview
 # 포트 및 설정 파일을 지정하여 미리보기 서버 시작
 lightstair-css preview -p 3000 -c my-config.yml
 ```
+
+## API
+
+CLI 외에도 JavaScript 코드에서 직접 사용할 수 있습니다.
+
+### 설정 파일 읽기
+
+```js
+import { buildConfig } from 'lightstair-css';
+
+const config = buildConfig('./lightstair-css.yml');
+```
+
+YAML 설정 파일을 읽어서 기본값이 모두 채워진 설정 객체를 반환합니다.
+
+### CSS 생성
+
+```js
+import { generateCSS } from 'lightstair-css';
+
+const css = generateCSS(config);
+```
+
+설정 객체를 기반으로 CSS 문자열을 생성합니다. 동적으로 계산되는 CSS 변수 코드가 생성됩니다.
+
+### Bake된 CSS 생성
+
+```js
+import { generateBakedCSS } from 'lightstair-css';
+
+const css = generateBakedCSS(config, 'oklch'); // 또는 'rgb', 'hex'
+```
+
+계산된 실제 색상 값이 이미 포함된 CSS를 생성합니다. `--bake` CLI 옵션과 동일합니다.
+
+### 색상 변수 객체 생성
+
+```js
+import { generateColorVars } from 'lightstair-css';
+
+const colorVars = generateColorVars(config);
+```
+
+라이트/다크 테마별 색상 값을 포함하는 객체를 반환합니다.
+
+```js
+// 반환 예시
+{
+    '--tx-1': { light: { oklch: '...', rgb: '...', hex: '...' }, dark: { ... } },
+    '--bg-1': { light: { ... }, dark: { ... } },
+    '--bd-1': { light: { ... }, dark: { ... } },
+}
+```
+
+### 전체 예시
+
+```js
+import * as LightstairCss from 'lightstair-css';
+
+// 1. 설정 파일 읽기
+const configPath = './lightstair-css.yml';
+const config = LightstairCss.buildConfig(configPath);
+
+// 2. CSS 생성
+const css = LightstairCss.generateCSS(config);
+
+// 3. 파일로 저장
+import { writeFileSync } from 'node:fs';
+writeFileSync('./colors.css', css);
+```
