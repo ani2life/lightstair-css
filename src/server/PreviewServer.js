@@ -37,30 +37,20 @@ export class PreviewServer {
     async start() {
         return new Promise((resolve, reject) => {
             this.#server = http.createServer((req, res) => {
-                // 설정 파일 실시간 반영을 위해 항상 다시 읽기
-                const config = this.#config.read();
-
-                if (req.url === '/') {
-                    this.#router.handleIndex(res);
-                } else if (req.url === '/css') {
-                    this.#router.handleCSS(config, res);
-                } else if (req.url === '/config') {
-                    this.#router.handleConfig(config, res);
-                } else if (req.url === '/color-vars') {
-                    this.#router.handleColorVars(config, res);
-                } else if (req.url === '/sse') {
+                // SSE — 라우터 외부에서 별도 처리
+                if (req.url === '/sse') {
                     res.writeHead(200, {
                         'Content-Type': 'text/event-stream',
                         'Cache-Control': 'no-cache',
                         'Connection': 'keep-alive',
                     });
                     this.#sse.add(res);
-                } else if (req.url.endsWith('.svg') || req.url.endsWith('.ico')) {
-                    this.#router.handleStatic(req.url, res);
-                } else {
-                    res.writeHead(404);
-                    res.end('Not Found');
+                    return;
                 }
+
+                // 설정 파일 실시간 반영을 위해 매 요청마다 재읽기
+                const config = this.#config.read();
+                this.#router.handle(req, res, config);
             });
 
             this.#watcher = chokidar.watch(this.#configPath, {
