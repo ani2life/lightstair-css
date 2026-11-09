@@ -1,11 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { DEFAULT_CONFIG_FILE, DEFAULT_CONFIG_PATH } from './constants.js';
 import { Command, Option } from 'commander';
-import { parse } from 'yaml';
 import { ConfigFile } from './ConfigFile.js';
-import { generateCSS, generateBakedCSS, generateColorVars } from './generator.js';
+import { generateCSS, generateBakedCSS } from './generator.js';
 import { PreviewServer } from './server/PreviewServer.js';
 
 const program = new Command();
@@ -31,7 +29,6 @@ function ensureConfigFile(configPath, { suppressIfExists = false } = {}) {
  * 옵션에서 설정 파일 경로를 해석하고, 기본 경로인 경우 파일을 생성합니다.
  * @param {object} options - CLI 옵션 객체
  * @param {string} [options.config] - 설정 파일 경로 (선택사항)
- * @param {object} [options] - 옵션 객체
  * @param {boolean} [options.suppressIfExists=true] - 파일 존재 시 로그 출력 억제 여부
  * @returns {string} 해석된 설정 파일의 절대 경로
  */
@@ -78,7 +75,7 @@ program
             console.log(`[OK] Output written to: ${outputPath}`);
         } catch (err) {
             console.error(`[Error] Failed to process config: ${configPath}`);
-            console.error(err.message);
+            console.error(err);
             process.exit(1);
         }
     });
