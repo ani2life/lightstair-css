@@ -3,6 +3,7 @@ import { join, resolve, extname, sep } from 'node:path';
 import { generatePreviewCSS, generateColorVars } from '../generator.js';
 import { PREVIEW_DIR } from '../constants.js';
 
+/** @type {Record<string, string>} */
 const STATIC_CONTENT_TYPES = {
     '.svg': 'image/svg+xml',
     '.ico': 'image/x-icon',
@@ -30,7 +31,7 @@ function serveStaticFile(filePath, res) {
         res.writeHead(200, { 'Content-Type': contentType });
         res.end(content);
     } catch {
-        console.error(`[Error] Static file not found: ${filePath}`);
+        console.error('Static file not found:', filePath);
         res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end('Not Found');
     }
@@ -42,7 +43,7 @@ function serveStaticFile(filePath, res) {
  *   handle: (
  *     req: import('node:http').IncomingMessage,
  *     res: import('node:http').ServerResponse,
- *     config: object
+ *     config: import('../types.js').LightstairConfig
  *   ) => void
  * }}
  */
@@ -52,7 +53,7 @@ export function createRouter() {
          * 요청을 처리합니다.
          * @param {import('node:http').IncomingMessage} req
          * @param {import('node:http').ServerResponse} res
-         * @param {object} config - 빌드된 설정 객체
+         * @param {import('../types.js').LightstairConfig} config - 빌드된 설정 객체
          */
         handle(req, res, config) {
             const configMissing = () => {
@@ -65,6 +66,12 @@ export function createRouter() {
             };
 
             const { url } = req;
+
+            if (!url) {
+                res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+                res.end('Not Found');
+                return;
+            }
 
             if (url === '/') {
                 const htmlPath = join(PREVIEW_DIR, 'index.html');
@@ -81,9 +88,10 @@ export function createRouter() {
                     res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
                     res.end(css, 'utf-8');
                 } catch (err) {
-                    console.error('[Error] CSS generation failed:', err.message);
+                    const message = 'CSS generation failed.';
+                    console.error(message, err);
                     res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-                    res.end(`Error: ${err.message}`, 'utf-8');
+                    res.end(message, 'utf-8');
                 }
                 return;
             }
@@ -94,9 +102,10 @@ export function createRouter() {
                     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
                     res.end(JSON.stringify(config), 'utf-8');
                 } catch (err) {
-                    console.error('[Error] Config serialization failed:', err.message);
+                    const message = 'Config serialization failed.';
+                    console.error(message, err);
                     res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-                    res.end(`Error: ${err.message}`, 'utf-8');
+                    res.end(message, 'utf-8');
                 }
                 return;
             }
@@ -108,9 +117,10 @@ export function createRouter() {
                     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
                     res.end(JSON.stringify(colorVars), 'utf-8');
                 } catch (err) {
-                    console.error('[Error] Variables generation failed:', err.message);
+                    const message = 'Variables generation failed.';
+                    console.error(message, err);
                     res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-                    res.end(`Error: ${err.message}`, 'utf-8');
+                    res.end(message, 'utf-8');
                 }
                 return;
             }
