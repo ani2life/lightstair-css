@@ -21,7 +21,7 @@ export class ConfigFile {
 
     /**
      * 설정 파일을 읽고 기본값과 병합하여 반환합니다.
-     * @returns {object} 기본값이 모두 채워진 설정 객체
+     * @returns {import('./types.js').LightstairConfig} 기본값이 모두 채워진 설정 객체
      */
     read() {
         const raw = readFileSync(this.#configPath, 'utf-8');

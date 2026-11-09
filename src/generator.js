@@ -3,7 +3,7 @@ import { beautify } from '@toolsnap/css-minifier-tool';
 
 /**
  * CSS 조각 객체를 빌드합니다. generateCSS / generatePreviewCSS 에서 공통으로 사용합니다.
- * @param {object} config - 설정 객체
+ * @param {import('./types.js').LightstairConfig} config - 설정 객체
  * @returns {{
  *     baseCss: string
  *     lightThemeCss: string
@@ -28,6 +28,9 @@ function buildCssParts(config) {
 
     /**
      * 단계별 CSS 변수 문자열을 빌드합니다.
+     * @param {string} prefix - CSS 변수 접두사
+     * @param {number} steps - 단계 수
+     * @returns {string} 단계별 CSS 변수 선언 문자열
      */
     function buildSteps(prefix, steps) {
         const initL = `var(--${prefix}-init-l)`;
@@ -82,7 +85,7 @@ function buildCssParts(config) {
 
 /**
  * 설정 객체를 기반으로 CSS 변수 문자열을 생성합니다.
- * @param {object} config - 설정 객체
+ * @param {import('./types.js').LightstairConfig} config - 설정 객체
  * @returns {string} 생성된 CSS 문자열
  */
 export function generateCSS(config) {
@@ -110,7 +113,7 @@ export function generateCSS(config) {
 /**
  * 설정 객체를 기반으로 미리보기용 CSS 변수 문자열을 생성합니다.
  * 미리보기 페이지에서 사용할 색상 변수 (preview-tx-color, preview-bg-color 등) 를 포함합니다.
- * @param {object} config - 설정 객체
+ * @param {import('./types.js').LightstairConfig} config - 설정 객체
  * @returns {string} 미리보기용 CSS 문자열
  */
 export function generatePreviewCSS(config) {
@@ -162,8 +165,8 @@ export function generatePreviewCSS(config) {
 /**
  * 설정 객체를 기반으로 bake된 CSS 변수 문자열을 생성합니다.
  * 실제 색상 값(oklch/rgb/hex)이 이미 계산되어 포함된 CSS를 반환합니다.
- * @param {object} config - 설정 객체
- * @param {('oklch' | 'rgb' | 'hex')} format - 색상 포맷
+ * @param {import('./types.js').LightstairConfig} config - 설정 객체
+ * @param {import('./types.js').ColorFormat} format - 색상 포맷
  * @returns {string} 생성된 CSS 문자열
  */
 export function generateBakedCSS(config, format) {
@@ -179,6 +182,17 @@ export function generateBakedCSS(config, format) {
         tx_prefix, bg_prefix, bd_prefix,
     } = config;
 
+    /**
+     * 단계별 색상 값으로 구성된 CSS 변수 선언 문자열을 빌드합니다.
+     * @param {string} prefix - CSS 변수 접두사
+     * @param {number} initL - 초기 밝기
+     * @param {number} gap - 단계별 밝기 간격
+     * @param {number} steps - 단계 수
+     * @param {number} c - 채도 (Chroma)
+     * @param {number} h - 색상 (Hue)
+     * @param {import('./types.js').ColorFormat} format - 색상 포맷
+     * @returns {string} 단계별 CSS 변수 선언 문자열
+     */
     function buildSteps(prefix, initL, gap, steps, c, h, format) {
         return Array.from({ length: steps }, (_, i) => {
             const l = clamp(0, initL + gap * i, 1);
@@ -212,8 +226,8 @@ export function generateBakedCSS(config, format) {
 /**
  * 설정 객체를 기반으로 색상 변수 객체를 생성합니다.
  * 라이트/다크 테마별 색상 값을 포함하는 중첩 객체를 반환합니다.
- * @param {object} config - 설정 객체
- * @returns {object} 색상 변수를 담은 객체 (키: CSS 변수명, 값: { light, dark } 색상 정보)
+ * @param {import('./types.js').LightstairConfig} config - 설정 객체
+ * @returns {import('./types.js').ColorVars} 색상 변수를 담은 객체 (키: CSS 변수명, 값: { light, dark } 색상 정보)
  */
 export function generateColorVars(config) {
     const {
@@ -228,8 +242,21 @@ export function generateColorVars(config) {
         tx_prefix, bg_prefix, bd_prefix,
     } = config;
 
+    /** @type {import('./types.js').ColorVars} */
     const result = {};
 
+    /**
+     * 단계별 색상 변수를 result 객체에 추가합니다.
+     * @param {string} prefix - CSS 변수 접두사
+     * @param {number} lightInitL - 라이트 테마 초기 밝기
+     * @param {number} lightGap - 라이트 테마 단계별 밝기 간격
+     * @param {number} darkInitL - 다크 테마 초기 밝기
+     * @param {number} darkGap - 다크 테마 단계별 밝기 간격
+     * @param {number} steps - 단계 수
+     * @param {number} c - 채도 (Chroma)
+     * @param {number} h - 색상 (Hue)
+     * @returns {void}
+     */
     function addSteps(prefix, lightInitL, lightGap, darkInitL, darkGap, steps, c, h) {
         for (let i = 0; i < steps; i++) {
             const key = `--${prefix}-${i + 1}`;
