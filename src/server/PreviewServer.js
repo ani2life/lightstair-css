@@ -8,12 +8,19 @@ import { createRouter } from './routes.js';
  * 미리보기 서버를 생성하고 시작합니다.
  */
 export class PreviewServer {
+    /** @type {string} */
     #configPath;
+    /** @type {ConfigFile} */
     #config;
+    /** @type {number} */
     #port;
+    /** @type {SSEManager} */
     #sse;
+    /** @type {ReturnType<typeof createRouter>} */
     #router;
+    /** @type {import('node:http').Server | null} */
     #server;
+    /** @type {import('chokidar').FSWatcher | null} */
     #watcher;
 
     /**
@@ -65,7 +72,13 @@ export class PreviewServer {
             });
 
             this.#server.listen(this.#port, () => {
-                const actualPort = this.#server.address().port;
+                const address = this.#server?.address();
+                if (!address || typeof address === 'string') {
+                    reject(new Error(`Unexpected server address: ${String(address)}`));
+                    return;
+                }
+
+                const actualPort = address.port;
                 console.log(`[OK] Preview server running at http://localhost:${actualPort}`);
                 console.log('Press Ctrl+C to stop the server.');
                 resolve(actualPort);
